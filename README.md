@@ -1,2 +1,2 @@
 # JSM-Burp-Assist
-Burp AI Assistant
+Burp Local AI Assistant using Ollama
