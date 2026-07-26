@@ -143,7 +143,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
         self.taskManager._update_task_row(
             task_id=task_id,
             status="Completed",
-            completed_time=self._current_time()
+            completed_time=self.taskManager._current_time()
         )
 
         self._remove_active_task(task_id)
@@ -167,7 +167,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
         self._update_task_row(
             task_id=task_id,
             status="Error: {}".format(str(exception)),
-            completed_time=self._current_time()
+            completed_time=self.taskManager._current_time()
         )
 
         self._remove_active_task(task_id)
