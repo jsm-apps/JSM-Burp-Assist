@@ -118,7 +118,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
     
     def _remove_task(self, task_id):
         self._tasks.pop(task_id, None)
-        self._update_task_caption()
+        self.update_tab_caption()
                         
     def _print(self, msg):
         self._stdout.write((msg + "\n").encode("utf-8"))
