@@ -7,6 +7,8 @@ from javax.swing import JPanel, JScrollPane, JTable, JMenuItem
 from javax.swing.table import DefaultTableModel
 from javax.swing import JTabbedPane, SwingUtilities
 
+from java.util import UUID
+
 from techdetect import OllamaWorker
 
 class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
@@ -18,7 +20,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
         
         callbacks.setExtensionName("JSM Burp Assist")
         
-        self._tasks = []
+        self._tasks = {}
         self._init_ui()
         
         callbacks.addSuiteTab(self)
@@ -70,28 +72,54 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
                 return
                 
             self._print("Tech detection for "+str(url))
+            task_id = str(UUID.randomUUID())
+            self._tasks[task_id] = {
+                "id": task_id,
+                "status": "Processing",
+                "worker": None
+            }
+
             worker = OllamaWorker(
+                task_id=task_id,
                 on_complete=self.ollama_complete,
                 on_error=self.ollama_failed
             )
 
+            self._tasks[task_id]["worker"] = worker
+
             worker.start()
-            self._tasks.append("bert")
             
             self.update_tab_caption()
         except Exception as ex:
             self._print_err("JSM Error @ _handle_tech_detect : %s" % str(ex))
     
-    def ollama_complete(self, result):
+    def ollama_complete(self, task_id, result):
         self._print(result)          # "woop"
-        self.update_tab_caption()
+
+        task = self._tasks.get(task_id)
+
+        if task is None:
+            return
+
+        self._remove_task(task_id)
+
         # Later:
         # self.add_scan_issue(...)
     
-    def ollama_failed(self, exception):
-        self.update_tab_caption()
+    def ollama_failed(self, task_id, exception):
+        task = self._tasks.get(task_id)
+        
+        if task is None:
+            return
+
+        self._remove_task(task_id)
+        
         self._print_err(str(exception))
-                    
+    
+    def _remove_task(self, task_id):
+        self._tasks.pop(task_id, None)
+        self._update_task_caption()
+                        
     def _print(self, msg):
         self._stdout.write((msg + "\n").encode("utf-8"))
 
