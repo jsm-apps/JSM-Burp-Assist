@@ -221,7 +221,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
         def update():
             tabbed_pane = self.find_parent_tabbed_pane(
-                self._panel
+                self.taskManager._panel
             )
 
             if tabbed_pane is None:
@@ -231,7 +231,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
                 return
 
             index = tabbed_pane.indexOfComponent(
-                self._panel
+                self.taskManager._panel
             )
 
             if index >= 0:
