@@ -7,6 +7,8 @@ from javax.swing import JPanel, JScrollPane, JTable, JMenuItem
 from javax.swing.table import DefaultTableModel
 from javax.swing import JTabbedPane, SwingUtilities
 
+from tectdetect import OllamaWorker
+
 class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
     def registerExtenderCallbacks(self, callbacks):
         self._callbacks = callbacks
