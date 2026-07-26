@@ -34,7 +34,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
         self.taskManager = TaskManager()
 
-        self._init_ui()
+        self.taskManager.build_ui()
 
         callbacks.addSuiteTab(self)
         callbacks.registerContextMenuFactory(self)
