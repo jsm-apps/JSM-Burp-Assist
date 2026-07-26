@@ -94,14 +94,14 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
             task_id = str(UUID.randomUUID())
 
-            self._tasks[task_id] = {
+            self.taskManager._tasks[task_id] = {
                 "id": task_id,
                 "url": url,
                 "status": "Processing",
                 "worker": None
             }
 
-            self._add_task_row(
+            self.taskManager._add_task_row(
                 task_id=task_id,
                 url=url
             )
@@ -114,7 +114,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
                 on_error=self.ollama_failed
             )
 
-            self._tasks[task_id]["worker"] = worker
+            self.taskManager._tasks[task_id]["worker"] = worker
 
             worker.start()
 
