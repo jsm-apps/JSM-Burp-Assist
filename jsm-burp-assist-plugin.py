@@ -2,82 +2,134 @@ from burp import IBurpExtender
 from burp import IContextMenuFactory
 from burp import ITab
 
-from java.util import ArrayList
-from javax.swing import JPanel, JScrollPane, JTable, JMenuItem
-from javax.swing.table import DefaultTableModel
-from javax.swing import JTabbedPane, SwingUtilities
+from java.util import ArrayList, UUID, Date
+from java.text import SimpleDateFormat
 
-from java.util import UUID
+from javax.swing import (
+    JPanel,
+    JScrollPane,
+    JTable,
+    JMenuItem,
+    JTabbedPane,
+    SwingUtilities
+)
+
+from javax.swing.table import DefaultTableModel
 
 from techdetect import OllamaWorker
 
+
 class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
+
     def registerExtenderCallbacks(self, callbacks):
         self._callbacks = callbacks
         self._helpers = callbacks.getHelpers()
         self._stdout = callbacks.getStdout()
         self._stderr = callbacks.getStderr()
-        
+
         callbacks.setExtensionName("JSM Burp Assist")
-        
+
+        # Active tasks only. Used for the tab count.
         self._tasks = {}
+
+        # Maps task IDs to their row in the JTable.
+        self._task_rows = {}
+
+        self._date_formatter = SimpleDateFormat(
+            "yyyy-MM-dd HH:mm:ss"
+        )
+
         self._init_ui()
-        
+
         callbacks.addSuiteTab(self)
         callbacks.registerContextMenuFactory(self)
-        
-        
+
         self._print("Extension loaded successfully.")
-    
+
     def _init_ui(self):
         self._panel = JPanel()
         self._panel.setLayout(None)
 
-        columns = ["Task ID", "URL", "Status", "Created", "Completed"]
+        columns = [
+            "Task ID",
+            "URL",
+            "Status",
+            "Created",
+            "Completed"
+        ]
+
         self._table_model = DefaultTableModel(columns, 0)
         self._table = JTable(self._table_model)
 
         scroll = JScrollPane(self._table)
         scroll.setBounds(10, 10, 900, 400)
+
         self._panel.add(scroll)
-    
+
     def getTabCaption(self):
         return "JSM Assist"
 
     def getUiComponent(self):
         return self._panel
-            
+
     def createMenuItems(self, invocation):
         menu = ArrayList()
-        item = JMenuItem("Technology Detect", actionPerformed=lambda e: self._handle_tech_detect(invocation))
+
+        item = JMenuItem(
+            "Technology Detect",
+            actionPerformed=lambda event:
+                self._handle_tech_detect(invocation)
+        )
+
         menu.add(item)
         return menu
 
     def _handle_tech_detect(self, invocation):
         try:
             messages = invocation.getSelectedMessages()
+
             if not messages or len(messages) == 0:
                 self._print("No message selected.")
                 return
+
             message = messages[0]
             service = message.getHttpService()
 
-            req = message.getRequest()
-            analyzed = self._helpers.analyzeRequest(service, req)
-            url = analyzed.getUrl()
+            request = message.getRequest()
+            analysed = self._helpers.analyzeRequest(
+                service,
+                request
+            )
+
+            url = str(analysed.getUrl())
 
             response = message.getResponse()
+
             if response is None:
-                self._print_err("Selected item has no HTTP response.")
+                self._print_err(
+                    "Selected item has no HTTP response."
+                )
                 return
-                
-            self._print("Tech detection for "+str(url))
+
+            self._print(
+                "Tech detection for {}".format(url)
+            )
+
             task_id = str(UUID.randomUUID())
+
             self._tasks[task_id] = {
                 "id": task_id,
+                "url": url,
                 "status": "Processing",
                 "worker": None
             }
+
+            self._add_task_row(
+                task_id=task_id,
+                url=url
+            )
+
+            self.update_tab_caption()
 
             worker = OllamaWorker(
                 task_id=task_id,
@@ -88,46 +140,138 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
             self._tasks[task_id]["worker"] = worker
 
             worker.start()
-            
-            self.update_tab_caption()
-        except Exception as ex:
-            self._print_err("JSM Error @ _handle_tech_detect : %s" % str(ex))
-    
-    def ollama_complete(self, task_id, result):
-        self._print(result)          # "woop"
 
+        except Exception as ex:
+            self._print_err(
+                "JSM Error @ _handle_tech_detect: {}".format(
+                    str(ex)
+                )
+            )
+
+    def _add_task_row(self, task_id, url):
+        def update():
+            row_index = self._table_model.getRowCount()
+
+            row = [
+                task_id,
+                url,
+                "Processing",
+                self._current_time(),
+                ""
+            ]
+
+            self._table_model.addRow(row)
+            self._task_rows[task_id] = row_index
+
+        self._run_on_edt(update)
+
+    def _update_task_row(
+        self,
+        task_id,
+        status,
+        completed_time=None
+    ):
+        def update():
+            row_index = self._task_rows.get(task_id)
+
+            if row_index is None:
+                self._print_err(
+                    "Could not find table row for task {}".format(
+                        task_id
+                    )
+                )
+                return
+
+            # Status column
+            self._table_model.setValueAt(
+                status,
+                row_index,
+                2
+            )
+
+            if completed_time is not None:
+                # Completed column
+                self._table_model.setValueAt(
+                    completed_time,
+                    row_index,
+                    4
+                )
+
+        self._run_on_edt(update)
+
+    def ollama_complete(self, task_id, result):
         task = self._tasks.get(task_id)
 
         if task is None:
             return
 
-        self._remove_task(task_id)
+        self._print(
+            "Task {} completed: {}".format(
+                task_id,
+                result
+            )
+        )
+
+        self._update_task_row(
+            task_id=task_id,
+            status="Completed",
+            completed_time=self._current_time()
+        )
+
+        self._remove_active_task(task_id)
 
         # Later:
         # self.add_scan_issue(...)
-    
+
     def ollama_failed(self, task_id, exception):
         task = self._tasks.get(task_id)
-        
+
         if task is None:
             return
 
-        self._remove_task(task_id)
-        
-        self._print_err(str(exception))
-    
-    def _remove_task(self, task_id):
+        self._print_err(
+            "Task {} failed: {}".format(
+                task_id,
+                str(exception)
+            )
+        )
+
+        self._update_task_row(
+            task_id=task_id,
+            status="Error: {}".format(str(exception)),
+            completed_time=self._current_time()
+        )
+
+        self._remove_active_task(task_id)
+
+    def _remove_active_task(self, task_id):
+        """
+        Removes the task from the active-task collection.
+
+        The JTable row remains so the user can see the completed
+        or failed task.
+        """
         self._tasks.pop(task_id, None)
         self.update_tab_caption()
-                        
-    def _print(self, msg):
-        self._stdout.write((msg + "\n").encode("utf-8"))
 
-    def _print_err(self, msg):
-        self._stderr.write((msg + "\n").encode("utf-8"))
+    def _current_time(self):
+        return self._date_formatter.format(Date())
 
-    
+    def _run_on_edt(self, function):
+        if SwingUtilities.isEventDispatchThread():
+            function()
+        else:
+            SwingUtilities.invokeLater(function)
 
+    def _print(self, message):
+        self._stdout.write(
+            (message + "\n").encode("utf-8")
+        )
+
+    def _print_err(self, message):
+        self._stderr.write(
+            (message + "\n").encode("utf-8")
+        )
 
     def find_parent_tabbed_pane(self, component):
         parent = component.getParent()
@@ -140,27 +284,35 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
         return None
 
-
     def update_tab_caption(self):
-        caption = "JSM Assist"
         task_count = len(self._tasks)
+
         if task_count > 0:
-            caption = "JSM Assist (" + str(task_count) + ")"
-            
-        
+            caption = "JSM Assist ({})".format(
+                task_count
+            )
+        else:
+            caption = "JSM Assist"
+
         def update():
-            tabbed_pane = self.find_parent_tabbed_pane(self._panel)
+            tabbed_pane = self.find_parent_tabbed_pane(
+                self._panel
+            )
 
             if tabbed_pane is None:
-                self._print_err("Could not locate the Burp tabbed pane")
+                self._print_err(
+                    "Could not locate the Burp tabbed pane"
+                )
                 return
 
-            index = tabbed_pane.indexOfComponent(self._panel)
+            index = tabbed_pane.indexOfComponent(
+                self._panel
+            )
 
             if index >= 0:
-                tabbed_pane.setTitleAt(index, caption)
+                tabbed_pane.setTitleAt(
+                    index,
+                    caption
+                )
 
-        if SwingUtilities.isEventDispatchThread():
-            update()
-        else:
-            SwingUtilities.invokeLater(update)
+        self._run_on_edt(update)
