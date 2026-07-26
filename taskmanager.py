@@ -6,6 +6,7 @@ from javax.swing import (
     SwingUtilities
 )
 from java.text import SimpleDateFormat
+from javax.swing.table import DefaultTableModel
 
 class TaskManager():
     def __init__(self):

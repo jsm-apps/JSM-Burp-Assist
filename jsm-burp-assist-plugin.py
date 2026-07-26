@@ -14,7 +14,7 @@ from javax.swing import (
     SwingUtilities
 )
 
-from javax.swing.table import DefaultTableModel
+
 
 from taskmanager import TaskManager
 from techdetect import OllamaWorker
