@@ -70,12 +70,28 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
                 return
                 
             self._print("Tech detection for "+str(url))
+            worker = OllamaWorker(
+                on_complete=self.ollama_complete,
+                on_error=self.ollama_failed
+            )
+
+            worker.start()
             self._tasks.append("bert")
             
             self.update_tab_caption()
         except Exception as ex:
             self._print_err("JSM Error @ _handle_tech_detect : %s" % str(ex))
-            
+    
+    def ollama_complete(self, result):
+        self._print(result)          # "woop"
+        self.update_tab_caption()
+        # Later:
+        # self.add_scan_issue(...)
+    
+    def ollama_failed(self, exception):
+        self.update_tab_caption()
+        self._print_err(str(exception))
+                    
     def _print(self, msg):
         self._stdout.write((msg + "\n").encode("utf-8"))
 
