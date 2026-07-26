@@ -3,7 +3,9 @@ from burp import IContextMenuFactory
 from burp import ITab
 
 from java.util import ArrayList
-from javax.swing import JMenuItem
+from javax.swing import JPanel, JScrollPane, JTable, JMenuItem
+from javax.swing.table import DefaultTableModel
+from javax.swing import JTabbedPane, SwingUtilities
 
 class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
     def registerExtenderCallbacks(self, callbacks):
@@ -14,11 +16,33 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
         
         callbacks.setExtensionName("JSM Burp Assist")
         
+        self._tasks = []
+        self._init_ui()
+        
+        callbacks.addSuiteTab(self)
         callbacks.registerContextMenuFactory(self)
         
         
         self._print("Extension loaded successfully.")
+    
+    def _init_ui(self):
+        self._panel = JPanel()
+        self._panel.setLayout(None)
 
+        columns = ["Task ID", "URL", "Status", "Created", "Completed"]
+        self._table_model = DefaultTableModel(columns, 0)
+        self._table = JTable(self._table_model)
+
+        scroll = JScrollPane(self._table)
+        scroll.setBounds(10, 10, 900, 400)
+        self._panel.add(scroll)
+    
+    def getTabCaption(self):
+        return "JSM Assist"
+
+    def getUiComponent(self):
+        return self._panel
+            
     def createMenuItems(self, invocation):
         menu = ArrayList()
         item = JMenuItem("Technology Detect", actionPerformed=lambda e: self._handle_tech_detect(invocation))
@@ -44,6 +68,14 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
                 return
                 
             self._print("Tech detection for "+str(url))
+            self._tasks.append("bert")
+            task_count = len(self._tasks)
+            label=""
+            if task_count > 0:
+                label = "JSM Assist (" + str(task_count) + ")"
+            else:
+                label = "JSM Assist"
+            self.update_tab_caption(label)
         except Exception as ex:
             self._print_err("JSM Error @ _handle_tech_detect : %s" % str(ex))
             
@@ -52,3 +84,33 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
     def _print_err(self, msg):
         self._stderr.write((msg + "\n").encode("utf-8"))
+
+    
+
+
+    def find_parent_tabbed_pane(self, component):
+        parent = component.getParent()
+
+        while parent is not None:
+            if isinstance(parent, JTabbedPane):
+                return parent
+
+            parent = parent.getParent()
+
+        return None
+
+
+    def update_tab_caption(self, caption):
+        def update():
+            tabbed_pane = self.find_parent_tabbed_pane(self._panel)
+
+            if tabbed_pane is None:
+                self._print_err("Could not locate the Burp tabbed pane")
+                return
+
+            index = tabbed_pane.indexOfComponent(self._panel)
+
+            if index >= 0:
+                tabbed_pane.setTitleAt(index, caption)
+
+        SwingUtilities.invokeLater(update)
