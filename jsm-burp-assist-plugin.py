@@ -3,7 +3,7 @@ from burp import IContextMenuFactory
 from burp import ITab
 
 from java.util import ArrayList, UUID, Date
-from java.text import SimpleDateFormat
+
 
 from javax.swing import (
     JPanel,
@@ -16,6 +16,7 @@ from javax.swing import (
 
 from javax.swing.table import DefaultTableModel
 
+from taskManager import TaskManager
 from techdetect import OllamaWorker
 
 
@@ -29,15 +30,9 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
         callbacks.setExtensionName("JSM Burp Assist")
 
-        # Active tasks only. Used for the tab count.
-        self._tasks = {}
+        
 
-        # Maps task IDs to their row in the JTable.
-        self._task_rows = {}
-
-        self._date_formatter = SimpleDateFormat(
-            "yyyy-MM-dd HH:mm:ss"
-        )
+        self.taskManager = TaskManager()
 
         self._init_ui()
 
@@ -46,31 +41,13 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
         self._print("Extension loaded successfully.")
 
-    def _init_ui(self):
-        self._panel = JPanel()
-        self._panel.setLayout(None)
-
-        columns = [
-            "Task ID",
-            "URL",
-            "Status",
-            "Created",
-            "Completed"
-        ]
-
-        self._table_model = DefaultTableModel(columns, 0)
-        self._table = JTable(self._table_model)
-
-        scroll = JScrollPane(self._table)
-        scroll.setBounds(10, 10, 900, 400)
-
-        self._panel.add(scroll)
+    
 
     def getTabCaption(self):
         return "JSM Assist"
 
     def getUiComponent(self):
-        return self._panel
+        return self.taskManager.getPanel()
 
     def createMenuItems(self, invocation):
         menu = ArrayList()
@@ -148,56 +125,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
                 )
             )
 
-    def _add_task_row(self, task_id, url):
-        def update():
-            row_index = self._table_model.getRowCount()
 
-            row = [
-                task_id,
-                url,
-                "Processing",
-                self._current_time(),
-                ""
-            ]
-
-            self._table_model.addRow(row)
-            self._task_rows[task_id] = row_index
-
-        self._run_on_edt(update)
-
-    def _update_task_row(
-        self,
-        task_id,
-        status,
-        completed_time=None
-    ):
-        def update():
-            row_index = self._task_rows.get(task_id)
-
-            if row_index is None:
-                self._print_err(
-                    "Could not find table row for task {}".format(
-                        task_id
-                    )
-                )
-                return
-
-            # Status column
-            self._table_model.setValueAt(
-                status,
-                row_index,
-                2
-            )
-
-            if completed_time is not None:
-                # Completed column
-                self._table_model.setValueAt(
-                    completed_time,
-                    row_index,
-                    4
-                )
-
-        self._run_on_edt(update)
 
     def ollama_complete(self, task_id, result):
         task = self._tasks.get(task_id)
@@ -253,9 +181,6 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
         """
         self._tasks.pop(task_id, None)
         self.update_tab_caption()
-
-    def _current_time(self):
-        return self._date_formatter.format(Date())
 
     def _run_on_edt(self, function):
         if SwingUtilities.isEventDispatchThread():
