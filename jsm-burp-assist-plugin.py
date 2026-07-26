@@ -71,13 +71,8 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
                 
             self._print("Tech detection for "+str(url))
             self._tasks.append("bert")
-            task_count = len(self._tasks)
-            label=""
-            if task_count > 0:
-                label = "JSM Assist (" + str(task_count) + ")"
-            else:
-                label = "JSM Assist"
-            self.update_tab_caption(label)
+            
+            self.update_tab_caption()
         except Exception as ex:
             self._print_err("JSM Error @ _handle_tech_detect : %s" % str(ex))
             
@@ -102,7 +97,13 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
         return None
 
 
-    def update_tab_caption(self, caption):
+    def update_tab_caption(self):
+        caption = "JSM Assist"
+        task_count = len(self._tasks)
+        if task_count > 0:
+            caption = "JSM Assist (" + str(task_count) + ")"
+            
+        
         def update():
             tabbed_pane = self.find_parent_tabbed_pane(self._panel)
 
@@ -115,4 +116,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
             if index >= 0:
                 tabbed_pane.setTitleAt(index, caption)
 
-        SwingUtilities.invokeLater(update)
+        if SwingUtilities.isEventDispatchThread():
+            update()
+        else:
+            SwingUtilities.invokeLater(update)
