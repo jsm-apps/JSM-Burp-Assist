@@ -128,7 +128,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
 
     def ollama_complete(self, task_id, result):
-        task = self._tasks.get(task_id)
+        task = self.taskManager._tasks.get(task_id)
 
         if task is None:
             return
@@ -140,7 +140,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
             )
         )
 
-        self._update_task_row(
+        self.taskManager._update_task_row(
             task_id=task_id,
             status="Completed",
             completed_time=self._current_time()
@@ -152,7 +152,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
         # self.add_scan_issue(...)
 
     def ollama_failed(self, task_id, exception):
-        task = self._tasks.get(task_id)
+        task = self.taskManager._tasks.get(task_id)
 
         if task is None:
             return
@@ -179,7 +179,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
         The JTable row remains so the user can see the completed
         or failed task.
         """
-        self._tasks.pop(task_id, None)
+        self.taskManager._tasks.pop(task_id, None)
         self.update_tab_caption()
 
     def _run_on_edt(self, function):
@@ -210,7 +210,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
         return None
 
     def update_tab_caption(self):
-        task_count = len(self._tasks)
+        task_count = len(self.taskManager._tasks)
 
         if task_count > 0:
             caption = "JSM Assist ({})".format(
