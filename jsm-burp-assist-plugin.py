@@ -19,6 +19,7 @@ from javax.swing import (
 from taskmanager import TaskManager
 from techdetect import OllamaWorker
 
+API_BASE_URL = "http://127.0.0.1:5000/" 
 
 class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
