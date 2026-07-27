@@ -3,15 +3,19 @@ from java.util import UUID
 from javax.swing import SwingUtilities
 import time
 from ollama import Client
-from pathlib import Path
+import os
 
 def load_from_file(filename):
-    path = (Path("/home/g/Documents/JSM/code/JSM-Burp-Assist/prompts") / filename)
-    if not path.exists():
-        raise FileNotFoundError(f"Payload file not found: {path}")
-    
-    filecontent = path.read_text(encoding="utf-8")
-    return filecontent
+    base = "/home/g/Documents/JSM/code/JSM-Burp-Assist/prompts"
+    path = os.path.join(base, filename)
+
+    print("Looking for:", path)
+
+    if not os.path.isfile(path):
+        raise IOError("File not found: %s" % path)
+
+    with open(path, "r") as f:
+        return f.read()
 
 class OllamaWorker(Runnable):
 
