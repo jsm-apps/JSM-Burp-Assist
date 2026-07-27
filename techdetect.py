@@ -20,7 +20,7 @@ class OllamaWorker(Runnable):
         self._on_complete = on_complete
         self._on_error = on_error
         self.model  = "qwen3.5:latest"
-        self.prompt = load_from_file("tectdetect.prompt.txt")
+        self.prompt = load_from_file("techdetect.prompt.txt")
 
     def start(self):
         thread = Thread(
