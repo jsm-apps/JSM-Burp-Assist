@@ -6,7 +6,7 @@ from ollama import Client
 from pathlib import Path
 
 def load_from_file(filename):
-    path = (Path("prompts") / filename)
+    path = (Path("/home/g/Documents/JSM/code/JSM-Burp-Assist/prompts") / filename)
     if not path.exists():
         raise FileNotFoundError(f"Payload file not found: {path}")
     
