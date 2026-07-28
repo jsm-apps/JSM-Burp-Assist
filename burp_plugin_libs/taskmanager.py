@@ -14,6 +14,17 @@ from java.lang import Runnable
 from java.text import SimpleDateFormat
 from java.util import Date, UUID
 
+def to_unicode(value):
+    if value is None:
+        return u""
+    if isinstance(value, unicode):
+        return value
+    try:
+        return unicode(value, "utf-8")
+    except TypeError:
+        return unicode(value)
+    except UnicodeDecodeError:
+        return unicode(value, "utf-8", "replace")
 
 class SwingCallback(Runnable):
     """
@@ -388,16 +399,16 @@ class IssueManager(object):
             return
 
         details_text = (
-            "URL: {url}\n"
-            "Task ID: {task_id}\n"
-            "Created: {created}\n\n"
-            "Details:\n"
-            "{details}"
+            u"URL: {url}\n"
+            u"Task ID: {task_id}\n"
+            u"Created: {created}\n\n"
+            u"Details:\n"
+            u"{details}"
         ).format(
-            url=issue["url"],
-            task_id=issue["task_id"],
-            created=issue["created"],
-            details=issue["details"]
+            url=to_unicode(issue["url"]),
+            task_id=to_unicode(issue["task_id"]),
+            created=to_unicode(issue["created"]),
+            details=to_unicode(issue["details"])
         )
 
         self._details_area.setText(details_text)
