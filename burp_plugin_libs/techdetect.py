@@ -3,21 +3,8 @@ from java.util import UUID
 from javax.swing import SwingUtilities
 import time
 
-import os
-
 from burp_plugin_libs.api_client import TaskApiClient, ApiClientError
 
-def load_from_file(filename):
-    base = "/home/g/Documents/JSM/code/JSM-Burp-Assist/prompts"
-    path = os.path.join(base, filename)
-
-    print("Looking for:", path)
-
-    if not os.path.isfile(path):
-        raise IOError("File not found: %s" % path)
-
-    with open(path, "r") as f:
-        return f.read()
 
 class OllamaWorker(Runnable):
 
@@ -27,8 +14,6 @@ class OllamaWorker(Runnable):
         self.message = message
         self._on_complete = on_complete
         self._on_error = on_error
-        self.model  = "qwen3.5:latest"
-        self.prompt = load_from_file("techdetect.prompt.txt")
 
     def start(self):
         thread = Thread(
