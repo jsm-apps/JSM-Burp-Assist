@@ -25,7 +25,7 @@ def load_from_file(filename):
     with open(path, "r") as f:
         return f.read()
 
-def create_summary(stringcontent):
+def create_summary(url, stringcontent):
     """
     Ask Ollama to summarise the supplied string.
 
@@ -48,16 +48,17 @@ def create_summary(stringcontent):
         raise ValueError("stringcontent cannot be empty")
 
     prompt = (
-        "Create a clear and concise summary of the following content.\n\n"
+        "Create a clear and concise summary of the following HTTP response.\n\n"
         "Requirements:\n"
         "- Include the most important findings and facts.\n"
         "- Remove repetition and unnecessary detail.\n"
         "- Do not invent information.\n"
         "- Use plain English.\n"
         "- Return only the summary.\n\n"
-        "Content:\n"
+        "URL: {}\n"
+        "HTTP Response:\n"
         "{}"
-    ).format(stringcontent)
+    ).format(url, stringcontent)
 
     try:
         response = ollama_client.chat(
@@ -112,7 +113,7 @@ def process_task(task_id, url, raw_response):
         #time.sleep(10)
 
         http_response = raw_response
-        summary = create_summary(http_response)
+        summary = create_summary(url, http_response)
 
         result = {
             "task_id": task_id,
