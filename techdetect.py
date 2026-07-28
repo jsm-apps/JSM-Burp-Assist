@@ -46,10 +46,10 @@ class OllamaWorker(Runnable):
 
             task = client.create_task("https://example.com")
 
-            print("Task ID: {0}".format(self.task_id))
+            print("Task ID: {0}".format(task['task_id']))
 
             result = client.wait_for_task(
-                task_id=self.task_id,
+                task_id=task['task_id'],
                 poll_interval=1,
                 timeout=30,
             )
