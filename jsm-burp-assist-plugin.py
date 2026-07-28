@@ -11,6 +11,7 @@ from javax.swing import (
     JTabbedPane,
     SwingUtilities
 )
+from javax.swing import JOptionPane
 
 from burp_plugin_libs.taskmanager import *
 from burp_plugin_libs.techdetect import OllamaWorker
@@ -62,6 +63,14 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
                 )
         
         menu.add(item2)
+
+        item3 = JMenuItem(
+                            "Ask Question...",
+                            actionPerformed=lambda event:
+                                self._handle_question(invocation)
+                        )
+                
+        menu.add(item3)
         return menu
 
     def get_selected_url_and_response(self, invocation):
@@ -115,6 +124,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
                 task_id=task_id,
                 url=url,
                 message=message,
+                question=None,
                 raw_response=raw_http_response,
                 on_complete=self.ollama_complete,
                 on_error=self.ollama_failed
@@ -147,6 +157,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
                 task_id=task_id,
                 url=url,
                 message=message,
+                question=None,
                 raw_response=raw_http_response,
                 on_complete=self.ollama_complete,
                 on_error=self.ollama_failed
@@ -160,6 +171,61 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
                 )
             )
 
+
+    def _handle_question(self, invocation):
+        try:
+            url, raw_http_response, message = self.get_selected_url_and_response(invocation)
+
+            if url is None or raw_http_response is None:
+                return
+
+            question = JOptionPane.showInputDialog(
+                None,
+                "Enter your question:",
+                "Ask AI",
+                JOptionPane.QUESTION_MESSAGE
+            )
+
+            # User pressed Cancel
+            if question is None:
+                return
+
+            question = question.strip()
+
+            # Empty question
+            if len(question) == 0:
+                JOptionPane.showMessageDialog(
+                    None,
+                    "Please enter a question.",
+                    "No Question",
+                    JOptionPane.WARNING_MESSAGE
+                )
+                return
+
+            self._print("Question for {}: {}".format(url, question))
+
+
+            task_id = self._results_manager.create_task(url)
+            self._results_manager.set_task_processing(task_id)
+
+            worker = OllamaWorker(
+                path="/ai/ask-question",
+                task_id=task_id,
+                url=url,
+                message=message,
+                question=question,
+                raw_response=raw_http_response,
+                on_complete=self.ollama_complete,
+                on_error=self.ollama_failed
+            )
+            worker.start()
+
+        except Exception as ex:
+            self._print_err(
+                "JSM Error @ _handle_question: {}".format(
+                    str(ex)
+                )
+            )
 
     def ollama_complete(self, task_id, message, result):
         self._results_manager.complete_task(task_id)

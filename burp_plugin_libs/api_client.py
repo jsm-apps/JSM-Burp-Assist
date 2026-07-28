@@ -84,7 +84,7 @@ class TaskApiClient(object):
                 "API returned invalid JSON: {0}".format(response_body)
             )
 
-    def create_task(self, path, url, raw_response):
+    def create_task(self, path, url, raw_response, question):
         """
         Submit a URL for processing.
 
@@ -97,14 +97,25 @@ class TaskApiClient(object):
         if not url:
             raise ValueError("url is required")
 
-        return self._request(
-            method="POST",
-            path=path,
-            data={
-                "url": url,
-                "raw_response": raw_response
-            },
-        )
+        if path == "/ai/ask-question":
+            return self._request(
+                method="POST",
+                path=path,
+                data={
+                    "url": url,
+                    "raw_response": raw_response,
+                    "question": question
+                },
+            )
+        else:
+            return self._request(
+                method="POST",
+                path=path,
+                data={
+                    "url": url,
+                    "raw_response": raw_response
+                },
+            )
 
     def get_task(self, task_id):
         """

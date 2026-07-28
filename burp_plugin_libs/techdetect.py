@@ -8,11 +8,12 @@ from burp_plugin_libs.api_client import TaskApiClient, ApiClientError
 
 class OllamaWorker(Runnable):
 
-    def __init__(self, path, task_id, url, message, raw_response, on_complete, on_error=None):
+    def __init__(self, path, task_id, url, message, question, raw_response, on_complete, on_error=None):
         self.path = path
         self.task_id = task_id
         self.url = url
         self.message = message
+        self.question = question
         self.raw_response = raw_response
         self._on_complete = on_complete
         self._on_error = on_error
@@ -33,7 +34,7 @@ class OllamaWorker(Runnable):
                 timeout=300,
             )
 
-            task = client.create_task(self.path, self.url, self.raw_response)
+            task = client.create_task(self.path, self.url, self.raw_response, self.question)
 
             print("Task ID: {0}".format(task['task_id']))
 
