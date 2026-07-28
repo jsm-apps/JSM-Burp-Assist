@@ -136,7 +136,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
 
     def ollama_complete(self, task_id, message, result):
-        task = self.taskManager._tasks.get(task_id)
+        #task = self.taskManager._tasks.get(task_id)
 
         if task is None:
             return
