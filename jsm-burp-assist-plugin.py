@@ -54,35 +54,54 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
         )
 
         menu.add(item)
+
+        item2 = JMenuItem(
+                    "XSS Detection",
+                    actionPerformed=lambda event:
+                        self._handle_xss_detection(invocation)
+                )
+        
+        menu.add(item2)
         return menu
+
+    def get_selected_url_and_response(self, invocation):
+        messages = invocation.getSelectedMessages()
+
+        if not messages or len(messages) == 0:
+            self._print("No message selected.")
+            return None, None
+
+        message = messages[0]
+        service = message.getHttpService()
+
+        request = message.getRequest()
+        analysed = self._helpers.analyzeRequest(
+            service,
+            request
+        )
+
+        url = str(analysed.getUrl())
+
+        response = message.getResponse()
+
+        if response is None:
+            self._print_err(
+                "Selected item has no HTTP response."
+            )
+            return url, None
+
+        raw_http_response = self._helpers.bytesToString(
+            response
+        )
+
+        return url, raw_http_response
 
     def _handle_tech_detect(self, invocation):
         try:
-            messages = invocation.getSelectedMessages()
+            url, raw_http_response = self.get_selected_url_and_response(invocation)
 
-            if not messages or len(messages) == 0:
-                self._print("No message selected.")
+            if url is None or raw_http_response is None:
                 return
-
-            message = messages[0]
-            service = message.getHttpService()
-
-            request = message.getRequest()
-            analysed = self._helpers.analyzeRequest(
-                service,
-                request
-            )
-
-            url = str(analysed.getUrl())
-            response = message.getResponse()
-
-            if response is None:
-                self._print_err(
-                    "Selected item has no HTTP response."
-                )
-                return
-
-            raw_response = self._helpers.bytesToString(response)
 
             self._print(
                 "Tech detection for {}".format(url)
@@ -92,6 +111,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
             self._results_manager.set_task_processing(task_id)
 
             worker = OllamaWorker(
+                path="/ai/techdetect",
                 task_id=task_id,
                 url=url,
                 message=message,
@@ -108,6 +128,37 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
                 )
             )
 
+    def _handle_xss_detection(self, invocation):
+        try:
+            url, raw_http_response = self.get_selected_url_and_response(invocation)
+
+            if url is None or raw_http_response is None:
+                return
+
+            self._print(
+                "Tech detection for {}".format(url)
+            )
+
+            task_id = self._results_manager.create_task(url)
+            self._results_manager.set_task_processing(task_id)
+
+            worker = OllamaWorker(
+                path="/ai/xssdetect",
+                task_id=task_id,
+                url=url,
+                message=message,
+                raw_response=raw_response,
+                on_complete=self.ollama_complete,
+                on_error=self.ollama_failed
+            )
+            worker.start()
+
+        except Exception as ex:
+            self._print_err(
+                "JSM Error @ _handle_tech_detect: {}".format(
+                    str(ex)
+                )
+            )
 
 
     def ollama_complete(self, task_id, message, result):

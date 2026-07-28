@@ -176,6 +176,52 @@ def create_task():
     }), 202
 
 
+@app.route("/ai/xssdetect", methods=["POST"])
+def create_xss_task():
+    data = request.get_json(silent=True)
+
+    if not data:
+        return jsonify({
+            "error": "Request body must contain JSON."
+        }), 400
+
+    url = data.get("url")
+
+    raw_response = data.get("raw_response")
+
+    if not url or not isinstance(url, str):
+        return jsonify({
+            "error": "A valid URL string is required."
+        }), 400
+
+    if not url.startswith(("http://", "https://")):
+        return jsonify({
+            "error": "URL must start with http:// or https://."
+        }), 400
+
+    task_id = str(uuid.uuid4())
+
+    with tasks_lock:
+        tasks[task_id] = {
+            "task_id": task_id,
+            "status": "pending",
+            "url": url,
+        }
+
+    worker = threading.Thread(
+        target=process_ai_task,
+        args=("xssdetect.prompt.txt", task_id, url, raw_response),
+        daemon=True,
+    )
+    worker.start()
+
+    return jsonify({
+        "task_id": task_id,
+        "status": "pending",
+    }), 202
+
+
+
 @app.route("/task/<task_id>", methods=["GET"])
 def get_task(task_id):
     with tasks_lock:

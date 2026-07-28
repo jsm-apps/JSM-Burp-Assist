@@ -84,7 +84,7 @@ class TaskApiClient(object):
                 "API returned invalid JSON: {0}".format(response_body)
             )
 
-    def create_task(self, url, raw_response):
+    def create_task(self, path, url, raw_response):
         """
         Submit a URL for processing.
 
@@ -99,7 +99,7 @@ class TaskApiClient(object):
 
         return self._request(
             method="POST",
-            path="/ai/techdetect",
+            path=path,
             data={
                 "url": url,
                 "raw_response": raw_response
