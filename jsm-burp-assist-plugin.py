@@ -95,32 +95,36 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
                 "Tech detection for {}".format(url)
             )
 
-            task_id = str(UUID.randomUUID())
+            task_id = self._results_manager.create_task(url)
 
-            self.taskManager._tasks[task_id] = {
-                "id": task_id,
-                "url": url,
-                "status": "Processing",
-                "worker": None
-            }
+            self._results_manager.set_task_processing(task_id)
 
-            self.taskManager._add_task_row(
-                task_id=task_id,
-                url=url
-            )
+            #task_id = str(UUID.randomUUID())
 
-            self.update_tab_caption()
+            #self.taskManager._tasks[task_id] = {
+            #    "id": task_id,
+            #    "url": url,
+            #    "status": "Processing",
+            #    "worker": None
+            #}
 
-            worker = OllamaWorker(
-                task_id=task_id,
-                message=message,
-                on_complete=self.ollama_complete,
-                on_error=self.ollama_failed
-            )
+            #self.taskManager._add_task_row(
+            #    task_id=task_id,
+            #    url=url
+            #)
 
-            self.taskManager._tasks[task_id]["worker"] = worker
+            #self.update_tab_caption()
 
-            worker.start()
+            #worker = OllamaWorker(
+            #    task_id=task_id,
+            #    message=message,
+            #    on_complete=self.ollama_complete,
+            #    on_error=self.ollama_failed
+            #)
+
+            #self.taskManager._tasks[task_id]["worker"] = worker
+
+            #worker.start()
 
         except Exception as ex:
             self._print_err(
