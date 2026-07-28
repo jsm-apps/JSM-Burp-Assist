@@ -91,8 +91,6 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
             task_id = self._results_manager.create_task(url)
             self._results_manager.set_task_processing(task_id)
 
-            self.update_tab_caption()
-
             worker = OllamaWorker(
                 task_id=task_id,
                 url=url,
@@ -101,9 +99,6 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
                 on_complete=self.ollama_complete,
                 on_error=self.ollama_failed
             )
-
-            #self.taskManager._tasks[task_id]["worker"] = worker
-
             worker.start()
 
         except Exception as ex:
@@ -116,11 +111,6 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
 
     def ollama_complete(self, task_id, message, result):
-        #task = self.taskManager._tasks.get(task_id)
-
-        #if task is None:
-        #    return
-
         self._results_manager.complete_task(task_id)
 
         self._print(
@@ -129,16 +119,6 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
             )
         )
 
-        #self.taskManager._update_task_row(
-        #    task_id=task_id,
-        #    status="Completed",
-        #    completed_time=self.taskManager._current_time()
-        #)
-
-        #self._remove_active_task(task_id)
-
-        # Later:
-        # self.add_scan_issue(...)
         title = result.get("title")
         details = result.get("details")
 
@@ -149,24 +129,8 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
                 task_id=task_id
             )
 
-        #issue = CustomScanIssue(
-        #        httpService=message.getHttpService(),
-        #        url=result["url"],
-        #        httpMessages=[message],
-        #        name="AI task complete",
-        #        detail=result["details"],
-        #        severity="Information",
-        #        confidence="Certain"
-        #    )
-
-        #self._callbacks.addScanIssue(issue)
-
     def ollama_failed(self, task_id, exception):
-        #task = self.taskManager._tasks.get(task_id)
         self._results_manager.fail_task(task_id, exception)
-
-        #if task is None:
-        #    return
 
         self._print_err(
             "Task {} failed: {}".format(
@@ -174,30 +138,6 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
                 str(exception)
             )
         )
-
-        #self._update_task_row(
-        #    task_id=task_id,
-        #    status="Error: {}".format(str(exception)),
-        #    completed_time=self.taskManager._current_time()
-        #)
-
-        #self._remove_active_task(task_id)
-
-    def _remove_active_task(self, task_id):
-        """
-        Removes the task from the active-task collection.
-
-        The JTable row remains so the user can see the completed
-        or failed task.
-        """
-        self.taskManager._tasks.pop(task_id, None)
-        self.update_tab_caption()
-
-    def _run_on_edt(self, function):
-        if SwingUtilities.isEventDispatchThread():
-            function()
-        else:
-            SwingUtilities.invokeLater(function)
 
     def _print(self, message):
         self._stdout.write(
@@ -209,48 +149,6 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
             (message + "\n").encode("utf-8")
         )
 
-    def find_parent_tabbed_pane(self, component):
-        parent = component.getParent()
-
-        while parent is not None:
-            if isinstance(parent, JTabbedPane):
-                return parent
-
-            parent = parent.getParent()
-
-        return None
-
-    def update_tab_caption(self):
-        task_count = len(self.taskManager._tasks)
-
-        if task_count > 0:
-            caption = "JSM Assist ({})".format(
-                task_count
-            )
-        else:
-            caption = "JSM Assist"
-
-        def update():
-            tabbed_pane = self.find_parent_tabbed_pane(
-                self.taskManager._panel
-            )
-
-            if tabbed_pane is None:
-                self._print_err(
-                    "Could not locate the Burp tabbed pane"
-                )
-                return
-
-            index = tabbed_pane.indexOfComponent(
-                self.taskManager._panel
-            )
-
-            if index >= 0:
-                tabbed_pane.setTitleAt(
-                    index,
-                    caption
-                )
-
-        self._run_on_edt(update)
+    
 
 
