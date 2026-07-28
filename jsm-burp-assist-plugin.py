@@ -17,8 +17,8 @@ from javax.swing import (
 
 
 
-from taskmanager import *
-from techdetect import OllamaWorker
+from burp_plugin_libs.taskmanager import *
+from burp_plugin_libs.techdetect import OllamaWorker
 
 
 API_BASE_URL = "http://127.0.0.1:5000/" 
