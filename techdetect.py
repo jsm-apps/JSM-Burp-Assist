@@ -21,8 +21,9 @@ def load_from_file(filename):
 
 class OllamaWorker(Runnable):
 
-    def __init__(self, task_id, message, on_complete, on_error=None):
+    def __init__(self, task_id, url, message, on_complete, on_error=None):
         self.task_id = task_id
+        self.url = url
         self.message = message
         self._on_complete = on_complete
         self._on_error = on_error
@@ -45,7 +46,7 @@ class OllamaWorker(Runnable):
                 timeout=10,
             )
 
-            task = client.create_task("https://example.com")
+            task = client.create_task(self.url)
 
             print("Task ID: {0}".format(task['task_id']))
 

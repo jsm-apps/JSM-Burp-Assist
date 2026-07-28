@@ -117,6 +117,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
             worker = OllamaWorker(
                 task_id=task_id,
+                url=url,
                 message=message,
                 on_complete=self.ollama_complete,
                 on_error=self.ollama_failed
