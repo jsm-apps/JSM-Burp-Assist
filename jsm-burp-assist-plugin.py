@@ -115,16 +115,16 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
             #self.update_tab_caption()
 
-            #worker = OllamaWorker(
-            #    task_id=task_id,
-            #    message=message,
-            #    on_complete=self.ollama_complete,
-            #    on_error=self.ollama_failed
-            #)
+            worker = OllamaWorker(
+                task_id=task_id,
+                message=message,
+                on_complete=self.ollama_complete,
+                on_error=self.ollama_failed
+            )
 
             #self.taskManager._tasks[task_id]["worker"] = worker
 
-            #worker.start()
+            worker.start()
 
         except Exception as ex:
             self._print_err(
@@ -141,6 +141,8 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
         if task is None:
             return
 
+        self._results_manager.complete_task(task_id)
+
         self._print(
             "Task {} completed: {}".format(
                 task_id,
@@ -148,13 +150,13 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
             )
         )
 
-        self.taskManager._update_task_row(
-            task_id=task_id,
-            status="Completed",
-            completed_time=self.taskManager._current_time()
-        )
+        #self.taskManager._update_task_row(
+        #    task_id=task_id,
+        #    status="Completed",
+        #    completed_time=self.taskManager._current_time()
+        #)
 
-        self._remove_active_task(task_id)
+        #self._remove_active_task(task_id)
 
         # Later:
         # self.add_scan_issue(...)
