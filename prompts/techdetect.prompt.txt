@@ -12,3 +12,12 @@ Any useful trick to extract more information from the technology in use?
 
 Output a summary of findings with regards to the technology in use.
 include a list of common file names and parameters  associated with the identified technology. 
+
+Create a clear and concise summary of the following HTTP response.
+        Requirements:
+        - Include the most important findings and facts.
+        - Remove repetition and unnecessary detail.
+        - Do not invent information.
+        - Use plain English.
+        - Do not ask questions.
+        - Return only the summary.

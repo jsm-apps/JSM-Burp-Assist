@@ -50,14 +50,6 @@ def create_summary(system_prompt_file, url, stringcontent):
     system_prompt = load_from_file(system_prompt_file)
 
     prompt = (
-        "Create a clear and concise summary of the following HTTP response.\n\n"
-        "Requirements:\n"
-        "- Include the most important findings and facts.\n"
-        "- Remove repetition and unnecessary detail.\n"
-        "- Do not invent information.\n"
-        "- Use plain English.\n"
-        "- Do not ask questions.\n"
-        "- Return only the summary.\n\n"
         "URL: {}\n"
         "HTTP Response:\n"
         "{}"
