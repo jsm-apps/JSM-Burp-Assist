@@ -120,8 +120,8 @@ class TaskApiClient(object):
     def wait_for_task(
         self,
         task_id,
-        poll_interval=1,
-        timeout=30,
+        poll_interval=10,
+        timeout=300,
         status_callback=None,
     ):
         """
