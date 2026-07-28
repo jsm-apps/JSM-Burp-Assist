@@ -287,8 +287,6 @@ class IssueManager(object):
 
         columns = [
             "Issue ID",
-            "Title",
-            "Severity",
             "URL",
             "Task ID",
             "Created"
@@ -334,10 +332,8 @@ class IssueManager(object):
 
     def add_issue(
         self,
-        title,
         url,
         details,
-        severity="Information",
         task_id=None,
         issue_id=None
     ):
@@ -346,8 +342,6 @@ class IssueManager(object):
 
         issue = {
             "issue_id": issue_id,
-            "title": title,
-            "severity": severity,
             "url": url,
             "details": details,
             "task_id": task_id or "",
@@ -394,16 +388,12 @@ class IssueManager(object):
             return
 
         details_text = (
-            "Title: {title}\n"
-            "Severity: {severity}\n"
             "URL: {url}\n"
             "Task ID: {task_id}\n"
             "Created: {created}\n\n"
             "Details:\n"
             "{details}"
         ).format(
-            title=issue["title"],
-            severity=issue["severity"],
             url=issue["url"],
             task_id=issue["task_id"],
             created=issue["created"],
@@ -419,8 +409,6 @@ class IssueManager(object):
 
             row = [
                 issue["issue_id"],
-                issue["title"],
-                issue["severity"],
                 issue["url"],
                 issue["task_id"],
                 issue["created"]
@@ -509,17 +497,13 @@ class ResultsTabManager(object):
 
     def add_issue(
         self,
-        title,
         url,
         details,
-        severity="Information",
         task_id=None
     ):
         issue_id = self.issue_manager.add_issue(
-            title=title,
             url=url,
             details=details,
-            severity=severity,
             task_id=task_id
         )
 

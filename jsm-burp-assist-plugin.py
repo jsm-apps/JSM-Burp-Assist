@@ -170,13 +170,8 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
         if title and details:
             self._results_manager.add_issue(
-                title=title,
                 url=result.get("url", ""),
                 details=details,
-                severity=result.get(
-                    "severity",
-                    "Information"
-                ),
                 task_id=task_id
             )
 
@@ -193,10 +188,11 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
         #self._callbacks.addScanIssue(issue)
 
     def ollama_failed(self, task_id, exception):
-        task = self.taskManager._tasks.get(task_id)
+        #task = self.taskManager._tasks.get(task_id)
+        self._results_manager.fail_task(task_id, exception)
 
-        if task is None:
-            return
+        #if task is None:
+        #    return
 
         self._print_err(
             "Task {} failed: {}".format(
@@ -205,13 +201,13 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
             )
         )
 
-        self._update_task_row(
-            task_id=task_id,
-            status="Error: {}".format(str(exception)),
-            completed_time=self.taskManager._current_time()
-        )
+        #self._update_task_row(
+        #    task_id=task_id,
+        #    status="Error: {}".format(str(exception)),
+        #    completed_time=self.taskManager._current_time()
+        #)
 
-        self._remove_active_task(task_id)
+        #self._remove_active_task(task_id)
 
     def _remove_active_task(self, task_id):
         """
