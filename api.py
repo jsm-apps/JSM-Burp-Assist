@@ -54,6 +54,7 @@ def create_summary(url, stringcontent):
         "- Remove repetition and unnecessary detail.\n"
         "- Do not invent information.\n"
         "- Use plain English.\n"
+        "- Do not ask questions.\n"
         "- Return only the summary.\n\n"
         "URL: {}\n"
         "HTTP Response:\n"
