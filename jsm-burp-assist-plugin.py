@@ -136,7 +136,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
                 return
 
             self._print(
-                "Tech detection for {}".format(url)
+                "XSS detection for {}".format(url)
             )
 
             task_id = self._results_manager.create_task(url)
@@ -155,7 +155,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
         except Exception as ex:
             self._print_err(
-                "JSM Error @ _handle_tech_detect: {}".format(
+                "JSM Error @ _handle_xss_detect: {}".format(
                     str(ex)
                 )
             )
