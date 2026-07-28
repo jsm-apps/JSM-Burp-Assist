@@ -5,7 +5,126 @@ import time
 import uuid
 
 from flask import Flask, jsonify, request
+from ollama import Client
+import requests
 
+model = "qwen3.5:latest"
+ollama_host = "http://localhost:11434"
+ollama_client = Client(host=ollama_host)
+
+def create_summary(stringcontent):
+    """
+    Ask Ollama to summarise the supplied string.
+
+    Args:
+        stringcontent: Text to summarise.
+
+    Returns:
+        The generated summary as a string.
+
+    Raises:
+        ValueError: If no content was supplied.
+        RuntimeError: If Ollama fails or returns no summary.
+    """
+    if stringcontent is None:
+        raise ValueError("stringcontent is required")
+
+    stringcontent = str(stringcontent).strip()
+
+    if not stringcontent:
+        raise ValueError("stringcontent cannot be empty")
+
+    prompt = (
+        "Create a clear and concise summary of the following content.\n\n"
+        "Requirements:\n"
+        "- Include the most important findings and facts.\n"
+        "- Remove repetition and unnecessary detail.\n"
+        "- Do not invent information.\n"
+        "- Use plain English.\n"
+        "- Return only the summary.\n\n"
+        "Content:\n"
+        "{}"
+    ).format(stringcontent)
+
+    try:
+        response = ollama_client.chat(
+            model=model,
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are a precise summarisation assistant. "
+                        "Only use information found in the supplied content."
+                    )
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            options={
+                "temperature": 0.2
+            }
+        )
+
+        # Support both object-style and dictionary-style responses.
+        if hasattr(response, "message"):
+            summary = response.message.content
+        else:
+            summary = response.get("message", {}).get("content")
+
+        if not summary:
+            raise RuntimeError(
+                "Ollama returned an empty summary"
+            )
+
+        return summary.strip()
+
+    except Exception as exc:
+        raise RuntimeError(
+            "Failed to create summary: {}".format(exc)
+        )
+
+def get_raw_http_response(url, timeout=30, verify=True):
+    """
+    Fetch a URL and return the raw HTTP response.
+
+    Returns:
+        String containing:
+            HTTP/1.1 200 OK
+            Header: Value
+            ...
+
+            <body>
+    """
+
+    response = requests.get(
+        url,
+        allow_redirects=False,
+        timeout=timeout,
+        verify=verify,
+    )
+
+    # Build status line
+    status_line = "HTTP/1.1 {} {}".format(
+        response.status_code,
+        response.reason,
+    )
+
+    # Build headers
+    headers = "\r\n".join(
+        "{}: {}".format(k, v)
+        for k, v in response.headers.items()
+    )
+
+    # Body
+    body = response.text
+
+    return "{}\r\n{}\r\n\r\n{}".format(
+        status_line,
+        headers,
+        body,
+    )
 
 app = Flask(__name__)
 
@@ -22,12 +141,15 @@ def process_task(task_id, url):
     try:
         time.sleep(10)
 
+        http_response = get_raw_http_response(url)
+        summary = create_summary(http_response)
+
         result = {
             "task_id": task_id,
             "status": "complete",
             "title": "Example title",
             "url": url,
-            "details": "Example task details generated after processing the URL.",
+            "details": summary,
         }
 
         with tasks_lock:
