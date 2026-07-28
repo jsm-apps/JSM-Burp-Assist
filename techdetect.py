@@ -39,6 +39,11 @@ class OllamaWorker(Runnable):
         try:
             #result = ollama.generate(model=self.model, prompt=self.prompt)
 
+            client = TaskApiClient(
+                base_url="http://127.0.0.1:5000",
+                timeout=10,
+            )
+
             task = client.create_task("https://example.com")
 
             print("Task ID: {0}".format(self.task_id))
