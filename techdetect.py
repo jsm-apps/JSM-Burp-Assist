@@ -43,7 +43,7 @@ class OllamaWorker(Runnable):
 
             client = TaskApiClient(
                 base_url="http://127.0.0.1:5000",
-                timeout=10,
+                timeout=300,
             )
 
             task = client.create_task(self.url)
@@ -52,8 +52,8 @@ class OllamaWorker(Runnable):
 
             result = client.wait_for_task(
                 task_id=task['task_id'],
-                poll_interval=1,
-                timeout=30,
+                poll_interval=10,
+                timeout=300,
             )
 
             print("Title: {0}".format(result["title"]))
