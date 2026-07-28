@@ -5,7 +5,7 @@ import time
 
 import os
 
-from api_client import TaskApiClient, ApiClientError
+from burp_plugin_libs.api_client import TaskApiClient, ApiClientError
 
 def load_from_file(filename):
     base = "/home/g/Documents/JSM/code/JSM-Burp-Assist/prompts"
