@@ -139,7 +139,7 @@ def process_task(task_id, url):
     Simulate a task that takes 10 seconds.
     """
     try:
-        time.sleep(10)
+        #time.sleep(10)
 
         http_response = get_raw_http_response(url)
         summary = create_summary(http_response)

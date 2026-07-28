@@ -157,8 +157,8 @@ class TaskApiClient(object):
     def submit_and_wait(
         self,
         url,
-        poll_interval=1,
-        timeout=30,
+        poll_interval=10,
+        timeout=300,
         status_callback=None,
     ):
         """
