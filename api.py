@@ -47,6 +47,8 @@ def create_summary(url, stringcontent):
     if not stringcontent:
         raise ValueError("stringcontent cannot be empty")
 
+    system_prompt = load_from_file("techdetect.prompt.txt")
+
     prompt = (
         "Create a clear and concise summary of the following HTTP response.\n\n"
         "Requirements:\n"
@@ -61,29 +63,22 @@ def create_summary(url, stringcontent):
         "{}"
     ).format(url, stringcontent)
 
+    full_prompt = system_prompt+"\n"+prompt
+
     try:
-        response = ollama_client.chat(
+        response = ollama_client.generate(
             model=model,
-            messages=[
-                {
-                    "role": "system",
-                    "content": (load_from_file("techdetect.prompt.txt"))
-                },
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ],
+            prompt=full_prompt,
             options={
                 "temperature": 0.2
             }
         )
 
         # Support both object-style and dictionary-style responses.
-        if hasattr(response, "message"):
-            summary = response.message.content
+        if hasattr(response, "response"):
+            summary = response.response
         else:
-            summary = response.get("message", {}).get("content")
+            summary = response.get("response")
 
         if not summary:
             raise RuntimeError(
