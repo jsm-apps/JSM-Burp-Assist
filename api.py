@@ -9,7 +9,7 @@ from ollama import Client
 import requests
 import os
 
-model = "qwen3.5:latest"
+model = "aratan/qwen3.5-uncensored:9b"
 ollama_host = "http://localhost:11434"
 ollama_client = Client(host=ollama_host)
 
