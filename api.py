@@ -56,6 +56,7 @@ def create_summary(system_prompt_file, url, stringcontent):
     ).format(url, stringcontent)
 
     full_prompt = system_prompt+"\n"+prompt
+    print(full_prompt)
 
     try:
         response = ollama_client.generate(
