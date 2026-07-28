@@ -7,10 +7,23 @@ import uuid
 from flask import Flask, jsonify, request
 from ollama import Client
 import requests
+import os
 
 model = "qwen3.5:latest"
 ollama_host = "http://localhost:11434"
 ollama_client = Client(host=ollama_host)
+
+def load_from_file(filename):
+    base = "/home/g/Documents/JSM/code/JSM-Burp-Assist/prompts"
+    path = os.path.join(base, filename)
+
+    print("Looking for:", path)
+
+    if not os.path.isfile(path):
+        raise IOError("File not found: %s" % path)
+
+    with open(path, "r") as f:
+        return f.read()
 
 def create_summary(stringcontent):
     """
@@ -52,10 +65,7 @@ def create_summary(stringcontent):
             messages=[
                 {
                     "role": "system",
-                    "content": (
-                        "You are a precise summarisation assistant. "
-                        "Only use information found in the supplied content."
-                    )
+                    "content": (load_from_file("techdetect.prompt.txt"))
                 },
                 {
                     "role": "user",
