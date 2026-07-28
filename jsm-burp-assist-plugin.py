@@ -33,11 +33,11 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
         callbacks.setExtensionName("JSM Burp Assist")
 
-        
+        self._results_manager = ResultsTabManager(
+            error_callback=self._print_error
+        )
 
-        self.taskManager = TaskManager()
-
-        self.taskManager.build_ui()
+        self._main_panel = self._results_manager.build_ui()
 
         callbacks.addSuiteTab(self)
         callbacks.registerContextMenuFactory(self)
@@ -50,7 +50,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
         return "JSM Assist"
 
     def getUiComponent(self):
-        return self.taskManager.getPanel()
+        return self._main_panel
 
     def createMenuItems(self, invocation):
         menu = ArrayList()
