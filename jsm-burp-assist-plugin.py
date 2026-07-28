@@ -17,7 +17,7 @@ from javax.swing import (
 
 
 
-from taskmanager import TaskManager
+from taskmanager import *
 from techdetect import OllamaWorker
 
 
