@@ -150,8 +150,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
         self._print(
             "Task {} completed: {}".format(
-                task_id,
-                result
+                task_id
             )
         )
 
