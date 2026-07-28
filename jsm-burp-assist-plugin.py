@@ -96,7 +96,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
             self._print(
                 "Tech detection for {}".format(url)
             )
-            self._print(str(response))
+            #self._print(str(response))
 
             task_id = self._results_manager.create_task(url)
 
