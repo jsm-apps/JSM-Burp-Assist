@@ -61,10 +61,7 @@ def create_summary(system_prompt_file, url, stringcontent):
     try:
         response = ollama_client.generate(
             model=model,
-            prompt=full_prompt,
-            options={
-                "temperature": 0.2
-            }
+            prompt=full_prompt
         )
 
         # Support both object-style and dictionary-style responses.
