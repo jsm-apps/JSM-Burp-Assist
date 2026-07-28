@@ -95,46 +95,6 @@ def create_summary(stringcontent):
             "Failed to create summary: {}".format(exc)
         )
 
-def get_raw_http_response(url, timeout=30, verify=True):
-    """
-    Fetch a URL and return the raw HTTP response.
-
-    Returns:
-        String containing:
-            HTTP/1.1 200 OK
-            Header: Value
-            ...
-
-            <body>
-    """
-
-    response = requests.get(
-        url,
-        allow_redirects=False,
-        timeout=timeout,
-        verify=verify,
-    )
-
-    # Build status line
-    status_line = "HTTP/1.1 {} {}".format(
-        response.status_code,
-        response.reason,
-    )
-
-    # Build headers
-    headers = "\r\n".join(
-        "{}: {}".format(k, v)
-        for k, v in response.headers.items()
-    )
-
-    # Body
-    body = response.text
-
-    return "{}\r\n{}\r\n\r\n{}".format(
-        status_line,
-        headers,
-        body,
-    )
 
 app = Flask(__name__)
 
@@ -144,14 +104,14 @@ tasks = {}
 tasks_lock = threading.Lock()
 
 
-def process_task(task_id, url):
+def process_task(task_id, url, raw_response):
     """
     Simulate a task that takes 10 seconds.
     """
     try:
         #time.sleep(10)
 
-        http_response = get_raw_http_response(url)
+        http_response = raw_response
         summary = create_summary(http_response)
 
         result = {
@@ -185,6 +145,8 @@ def create_task():
 
     url = data.get("url")
 
+    raw_response = data.get("raw_response")
+
     if not url or not isinstance(url, str):
         return jsonify({
             "error": "A valid URL string is required."
@@ -206,7 +168,7 @@ def create_task():
 
     worker = threading.Thread(
         target=process_task,
-        args=(task_id, url),
+        args=(task_id, url, raw_response),
         daemon=True,
     )
     worker.start()

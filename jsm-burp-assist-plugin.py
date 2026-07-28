@@ -91,6 +91,8 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
                 )
                 return
 
+            raw_response = self._helpers.bytesToString(response)
+
             self._print(
                 "Tech detection for {}".format(url)
             )
@@ -120,6 +122,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
                 task_id=task_id,
                 url=url,
                 message=message,
+                raw_response=raw_response,
                 on_complete=self.ollama_complete,
                 on_error=self.ollama_failed
             )
