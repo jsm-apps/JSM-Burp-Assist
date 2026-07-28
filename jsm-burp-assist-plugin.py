@@ -1,11 +1,8 @@
 from burp import IBurpExtender
 from burp import IContextMenuFactory
 from burp import ITab
-from burp import IScanIssue
 
 from java.util import ArrayList, UUID, Date
-
-
 from javax.swing import (
     JPanel,
     JScrollPane,
@@ -15,13 +12,8 @@ from javax.swing import (
     SwingUtilities
 )
 
-
-
 from burp_plugin_libs.taskmanager import *
 from burp_plugin_libs.techdetect import OllamaWorker
-
-
-API_BASE_URL = "http://127.0.0.1:5000/" 
 
 class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
@@ -76,13 +68,12 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
             service = message.getHttpService()
 
             request = message.getRequest()
-            analysed = self._helpers.analyzeRequest(
-                service,
-                request
-            )
+            #analysed = self._helpers.analyzeRequest(
+            #    service,
+            #    request
+            #)
 
             url = str(analysed.getUrl())
-
             response = message.getResponse()
 
             if response is None:
@@ -96,27 +87,11 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
             self._print(
                 "Tech detection for {}".format(url)
             )
-            #self._print(str(response))
 
             task_id = self._results_manager.create_task(url)
-
             self._results_manager.set_task_processing(task_id)
 
-            #task_id = str(UUID.randomUUID())
-
-            #self.taskManager._tasks[task_id] = {
-            #    "id": task_id,
-            #    "url": url,
-            #    "status": "Processing",
-            #    "worker": None
-            #}
-
-            #self.taskManager._add_task_row(
-            #    task_id=task_id,
-            #    url=url
-            #)
-
-            #self.update_tab_caption()
+            self.update_tab_caption()
 
             worker = OllamaWorker(
                 task_id=task_id,
@@ -279,45 +254,3 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
         self._run_on_edt(update)
 
 
-class CustomScanIssue(IScanIssue):
-    def __init__(self, httpService, url, httpMessages, name, detail, severity, confidence):
-        self._httpService = httpService
-        self._url = url
-        self._httpMessages = httpMessages
-        self._name = name
-        self._detail = detail
-        self._severity = severity
-        self._confidence = confidence
-
-    def getUrl(self):
-        return self._url
-
-    def getIssueName(self):
-        return self._name
-
-    def getIssueType(self):
-        return 0
-
-    def getSeverity(self):
-        return self._severity
-
-    def getConfidence(self):
-        return self._confidence
-
-    def getIssueBackground(self):
-        return "This issue indicates that an AI-driven background task completed for the selected URL."
-
-    def getRemediationBackground(self):
-        return "No remediation required. This is an informational marker."
-
-    def getIssueDetail(self):
-        return self._detail
-
-    def getRemediationDetail(self):
-        return None
-
-    def getHttpMessages(self):
-        return self._httpMessages
-
-    def getHttpService(self):
-        return self._httpService
