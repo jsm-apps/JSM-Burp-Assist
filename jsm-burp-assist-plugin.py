@@ -112,6 +112,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
             worker = OllamaWorker(
                 task_id=task_id,
+                message=message,
                 on_complete=self.ollama_complete,
                 on_error=self.ollama_failed
             )
@@ -129,7 +130,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
 
 
-    def ollama_complete(self, task_id, result):
+    def ollama_complete(self, task_id, message, result):
         task = self.taskManager._tasks.get(task_id)
 
         if task is None:
@@ -152,6 +153,18 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
         # Later:
         # self.add_scan_issue(...)
+
+        issue = CustomScanIssue(
+                httpService=message.getHttpService(),
+                url=result["url"],
+                httpMessages=[message],
+                name="AI task complete",
+                detail=result["details"],
+                severity="Information",
+                confidence="Certain"
+            )
+
+        self._callbacks.addScanIssue(issue)
 
     def ollama_failed(self, task_id, exception):
         task = self.taskManager._tasks.get(task_id)

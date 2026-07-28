@@ -21,8 +21,9 @@ def load_from_file(filename):
 
 class OllamaWorker(Runnable):
 
-    def __init__(self, task_id, on_complete, on_error=None):
+    def __init__(self, task_id, message, on_complete, on_error=None):
         self.task_id = task_id
+        self.message = message
         self._on_complete = on_complete
         self._on_error = on_error
         self.model  = "qwen3.5:latest"
@@ -66,6 +67,7 @@ class OllamaWorker(Runnable):
             SwingUtilities.invokeLater(
                 lambda: self._on_complete(
                     self.task_id,
+                    self.message,
                     result
                 )
             )
