@@ -71,6 +71,7 @@ class OllamaWorker(Runnable):
             )
 
         except Exception as ex:
+            print("ERROR "+str(ex))
             if self._on_error is not None:
                 SwingUtilities.invokeLater(
                     lambda: self._on_error(
