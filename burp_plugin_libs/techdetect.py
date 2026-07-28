@@ -42,9 +42,9 @@ class OllamaWorker(Runnable):
                 timeout=300,
             )
 
-            print("Title: {0}".format(result["title"]))
-            print("URL: {0}".format(result["url"]))
-            print("Details: {0}".format(result["details"]))
+            #print("Title: {0}".format(result["title"]))
+            #print("URL: {0}".format(result["url"]))
+            #print("Details: {0}".format(result["details"]))
 
 
 
