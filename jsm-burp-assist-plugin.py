@@ -1,6 +1,7 @@
 from burp import IBurpExtender
 from burp import IContextMenuFactory
 from burp import ITab
+from burp import IScanIssue
 
 from java.util import ArrayList, UUID, Date
 
@@ -256,3 +257,47 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
                 )
 
         self._run_on_edt(update)
+
+
+class CustomScanIssue(IScanIssue):
+    def __init__(self, httpService, url, httpMessages, name, detail, severity, confidence):
+        self._httpService = httpService
+        self._url = url
+        self._httpMessages = httpMessages
+        self._name = name
+        self._detail = detail
+        self._severity = severity
+        self._confidence = confidence
+
+    def getUrl(self):
+        return self._url
+
+    def getIssueName(self):
+        return self._name
+
+    def getIssueType(self):
+        return 0
+
+    def getSeverity(self):
+        return self._severity
+
+    def getConfidence(self):
+        return self._confidence
+
+    def getIssueBackground(self):
+        return "This issue indicates that an AI-driven background task completed for the selected URL."
+
+    def getRemediationBackground(self):
+        return "No remediation required. This is an informational marker."
+
+    def getIssueDetail(self):
+        return self._detail
+
+    def getRemediationDetail(self):
+        return None
+
+    def getHttpMessages(self):
+        return self._httpMessages
+
+    def getHttpService(self):
+        return self._httpService
