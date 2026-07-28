@@ -99,7 +99,7 @@ class TaskApiClient(object):
 
         return self._request(
             method="POST",
-            path="/task",
+            path="/ai/techdetect",
             data={
                 "url": url,
                 "raw_response": raw_response

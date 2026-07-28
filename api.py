@@ -25,7 +25,7 @@ def load_from_file(filename):
     with open(path, "r") as f:
         return f.read()
 
-def create_summary(url, stringcontent):
+def create_summary(system_prompt_file, url, stringcontent):
     """
     Ask Ollama to summarise the supplied string.
 
@@ -47,7 +47,7 @@ def create_summary(url, stringcontent):
     if not stringcontent:
         raise ValueError("stringcontent cannot be empty")
 
-    system_prompt = load_from_file("techdetect.prompt.txt")
+    system_prompt = load_from_file(system_prompt_file)
 
     prompt = (
         "Create a clear and concise summary of the following HTTP response.\n\n"
@@ -101,7 +101,7 @@ tasks = {}
 tasks_lock = threading.Lock()
 
 
-def process_task(task_id, url, raw_response):
+def process_ai_task(prompt_file, task_id, url, raw_response):
     """
     Simulate a task that takes 10 seconds.
     """
@@ -109,7 +109,7 @@ def process_task(task_id, url, raw_response):
         #time.sleep(10)
 
         http_response = raw_response
-        summary = create_summary(url, http_response)
+        summary = create_summary(prompt_file, url, http_response)
 
         result = {
             "task_id": task_id,
@@ -131,7 +131,7 @@ def process_task(task_id, url, raw_response):
             }
 
 
-@app.route("/task", methods=["POST"])
+@app.route("/ai/techdetect", methods=["POST"])
 def create_task():
     data = request.get_json(silent=True)
 
@@ -164,8 +164,8 @@ def create_task():
         }
 
     worker = threading.Thread(
-        target=process_task,
-        args=(task_id, url, raw_response),
+        target=process_ai_task,
+        args=("techdetect.prompt.txt", task_id, url, raw_response),
         daemon=True,
     )
     worker.start()
