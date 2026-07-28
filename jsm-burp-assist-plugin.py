@@ -160,18 +160,32 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
         # Later:
         # self.add_scan_issue(...)
+        title = result.get("title")
+        details = result.get("details")
 
-        issue = CustomScanIssue(
-                httpService=message.getHttpService(),
-                url=result["url"],
-                httpMessages=[message],
-                name="AI task complete",
-                detail=result["details"],
-                severity="Information",
-                confidence="Certain"
+        if title and details:
+            self._results_manager.add_issue(
+                title=title,
+                url=result.get("url", ""),
+                details=details,
+                severity=result.get(
+                    "severity",
+                    "Information"
+                ),
+                task_id=task_id
             )
 
-        self._callbacks.addScanIssue(issue)
+        #issue = CustomScanIssue(
+        #        httpService=message.getHttpService(),
+        #        url=result["url"],
+        #        httpMessages=[message],
+        #        name="AI task complete",
+        #        detail=result["details"],
+        #        severity="Information",
+        #        confidence="Certain"
+        #    )
+
+        #self._callbacks.addScanIssue(issue)
 
     def ollama_failed(self, task_id, exception):
         task = self.taskManager._tasks.get(task_id)
