@@ -2,8 +2,10 @@ from java.lang import Runnable, Thread
 from java.util import UUID
 from javax.swing import SwingUtilities
 import time
-from ollama import Client
+
 import os
+
+from api_client import TaskApiClient, ApiClientError
 
 def load_from_file(filename):
     base = "/home/g/Documents/JSM/code/JSM-Burp-Assist/prompts"
@@ -35,8 +37,26 @@ class OllamaWorker(Runnable):
 
     def run(self):
         try:
-            result = ollama.generate(model=self.model, prompt=self.prompt)
-            print(result['response'])
+            #result = ollama.generate(model=self.model, prompt=self.prompt)
+
+            task = client.create_task("https://example.com")
+
+            print("Task ID: {0}".format(self.task_id))
+
+            result = client.wait_for_task(
+                task_id=self.task_id,
+                poll_interval=1,
+                timeout=30,
+            )
+
+            print("Title: {0}".format(result["title"]))
+            print("URL: {0}".format(result["url"]))
+            print("Details: {0}".format(result["details"]))
+
+
+
+
+            #print(result['response'])
 
             SwingUtilities.invokeLater(
                 lambda: self._on_complete(

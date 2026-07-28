@@ -10,6 +10,8 @@ from javax.swing.table import DefaultTableModel
 
 from java.util import ArrayList, UUID, Date
 
+
+
 class TaskManager():
     def __init__(self):
         # Active tasks only. Used for the tab count.
