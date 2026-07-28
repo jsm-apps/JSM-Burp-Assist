@@ -94,11 +94,11 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
             response
         )
 
-        return url, raw_http_response
+        return url, raw_http_response, message
 
     def _handle_tech_detect(self, invocation):
         try:
-            url, raw_http_response = self.get_selected_url_and_response(invocation)
+            url, raw_http_response, message = self.get_selected_url_and_response(invocation)
 
             if url is None or raw_http_response is None:
                 return
@@ -130,7 +130,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
     def _handle_xss_detection(self, invocation):
         try:
-            url, raw_http_response = self.get_selected_url_and_response(invocation)
+            url, raw_http_response, message = self.get_selected_url_and_response(invocation)
 
             if url is None or raw_http_response is None:
                 return
