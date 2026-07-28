@@ -68,10 +68,10 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
             service = message.getHttpService()
 
             request = message.getRequest()
-            #analysed = self._helpers.analyzeRequest(
-            #    service,
-            #    request
-            #)
+            analysed = self._helpers.analyzeRequest(
+                service,
+                request
+            )
 
             url = str(analysed.getUrl())
             response = message.getResponse()
