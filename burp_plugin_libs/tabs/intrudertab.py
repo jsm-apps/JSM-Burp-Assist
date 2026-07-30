@@ -7,7 +7,8 @@ from javax.swing import (
     JButton,
     JFrame,
     JScrollPane,
-    JTextArea
+    JTextArea,
+    JTextField
 )
 
 
