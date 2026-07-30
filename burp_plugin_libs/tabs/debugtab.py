@@ -14,7 +14,6 @@ class DiscoveryAction(ActionListener):
         frame.setLayout(None)
 
         label = JLabel("Discovery")
-        label.setFont(Font("SansSerif", Font.BOLD, 16))
         label.setBounds(20, 20, 200, 30)
         frame.add(label)
 
