@@ -19,6 +19,17 @@ from burp_plugin_libs.menuitems import MenuItems
 from burp_plugin_libs.utils import Utils
 from burp_plugin_libs.resultstabmanager import ResultsTabManager
 
+from urlparse import urlparse
+
+def get_base_url(url):
+    parsed = urlparse(url)
+
+    if not parsed.scheme or not parsed.hostname:
+        return None
+
+    return "%s://%s" % (parsed.scheme, parsed.hostname)
+
+
 class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
     def registerExtenderCallbacks(self, callbacks):
@@ -108,7 +119,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
     def _handle_send_to_intruder(self, invocation):
         url, raw_http_request, message = self.utils.get_selected_url_and_request(invocation)
-        self._results_manager.intruder_tab.setHTTPRequestTextAndURL(raw_http_request, url)
+        self._results_manager.intruder_tab.setHTTPRequestTextAndURL(raw_http_request, get_base_url(url))
         
     def api_complete(self, task_id, message, result):
         self._results_manager.complete_task(task_id)
