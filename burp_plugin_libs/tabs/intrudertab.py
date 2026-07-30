@@ -28,7 +28,7 @@ class IntruderWindow(ActionListener):
         north_panel = JPanel()
         north_panel.setLayout(FlowLayout())
 
-        target_label = JLabel("Target : " + self.target)
+        target_label = JLabel("Target : " + self.target.getText())
         btn_start = JButton("Start")
         btn_pause = JButton("Pause")
         btn_unpause = JButton("Resume")
@@ -127,7 +127,7 @@ class IntruderTab(object):
 
         run_button = JButton("Start Intruder...")
         run_button.setBounds(10, 500, 220, 30)
-        run_button.addActionListener(IntruderWindow(self._target_field.getText()))
+        run_button.addActionListener(IntruderWindow(self._target_field))
         self._panel.add(run_button)
 
 
