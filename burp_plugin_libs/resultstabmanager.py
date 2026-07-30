@@ -12,6 +12,7 @@ from javax.swing import (
 from burp_plugin_libs.swingcallback import SwingCallback
 from burp_plugin_libs.taskmanager import TaskManager
 from burp_plugin_libs.issuemanager import IssueManager
+from burp_plugin_libs.tabs.debugtab import DebugTab
 
 class ResultsTabManager(object):
     """
@@ -20,27 +21,25 @@ class ResultsTabManager(object):
 
     def __init__(self, error_callback=None):
         self._error_callback = error_callback
-
-        self.task_manager = TaskManager(
-            error_callback=error_callback
-        )
-
-        self.issue_manager = IssueManager(
-            error_callback=error_callback
-        )
+        self.task_manager = TaskManager(error_callback=error_callback)
+        self.issue_manager = IssueManager(error_callback=error_callback)
+        self.debug_tab = DebugTab(error_callback=error_callback)
 
         self._tabs = None
         self._task_tab_index = 0
         self._issue_tab_index = 1
+        self._debug_tab_index = 2
 
     def build_ui(self):
         self._tabs = JTabbedPane()
 
         task_panel = self.task_manager.build_ui()
         issue_panel = self.issue_manager.build_ui()
+        debug_panel = self.debug_tab.build_ui()
 
         self._tabs.addTab("Tasks (0)", task_panel)
         self._tabs.addTab("Issues (0)", issue_panel)
+        self._tabs.addTab("Debug", debug_panel)
 
         return self._tabs
 
