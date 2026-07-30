@@ -21,8 +21,12 @@ class IntruderTab(object):
         label.setBounds(10, 10, 200, 25)
         self._panel.add(label)
 
-        discovery_button = JButton("Discovery")
-        discovery_button.setBounds(10, 50, 120, 30)
-        self._panel.add(discovery_button)
+        add_button = JButton("Add $")
+        add_button.setBounds(10, 50, 120, 30)
+        self._panel.add(add_button)
+
+        clear_button = JButton("Clear $")
+        clear_button.setBounds(10, 70, 120, 30)
+        self._panel.add(clear_button)
 
         return self._panel
