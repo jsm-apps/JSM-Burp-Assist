@@ -63,8 +63,8 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
                 message=message,
                 question=question,
                 raw_response=raw_http_response,
-                on_complete=self.ollama_complete,
-                on_error=self.ollama_failed
+                on_complete=self.api_complete,
+                on_error=self.api_failed
             )
             worker.start()
 
@@ -89,13 +89,11 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
             "Ask AI",
             JOptionPane.QUESTION_MESSAGE
         )
-
         # User pressed Cancel
         if question is None:
             return
 
         question = question.strip()
-
         # Empty question
         if len(question) == 0:
             JOptionPane.showMessageDialog(
@@ -107,15 +105,9 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
             return
         self._run_menuitem(invocation, "/ai/ask-question", question)
         
-
-    def ollama_complete(self, task_id, message, result):
+    def api_complete(self, task_id, message, result):
         self._results_manager.complete_task(task_id)
-
-        self._print(
-            "Task {} completed".format(
-                task_id
-            )
-        )
+        self._print("API Task {} completed".format(task_id))
 
         title = result.get("title")
         details = result.get("details")
@@ -127,25 +119,15 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
                 task_id=task_id
             )
 
-    def ollama_failed(self, task_id, exception):
+    def api_failed(self, task_id, exception):
         self._results_manager.fail_task(task_id, exception)
-
-        self._print_err(
-            "Task {} failed: {}".format(
-                task_id,
-                str(exception)
-            )
-        )
+        self._print_err("API Task {} failed: {}".format(task_id, str(exception)))
 
     def _print(self, message):
-        self._stdout.write(
-            (message + "\n").encode("utf-8")
-        )
+        self._stdout.write((message + "\n").encode("utf-8"))
 
     def _print_err(self, message):
-        self._stderr.write(
-            (message + "\n").encode("utf-8")
-        )
+        self._stderr.write((message + "\n").encode("utf-8"))
 
     
 
