@@ -3,11 +3,10 @@ Burp Local AI Assistant using Ollama
 
 Requires that local Ollama is installed - https://ollama.com/download
 
-Burp plugin uses Jython 2.7
-API uses Python 3.11
-
+Burp plugin uses Jython 2.7, API uses Python 3.11
 
 Run API before using Burp plugin.
+
 $ python3.11 api.py
  * Serving Flask app 'api'
  * Debug mode: on
