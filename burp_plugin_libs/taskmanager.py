@@ -15,7 +15,7 @@ from java.text import SimpleDateFormat
 from java.util import Date, UUID
 
 from burp_plugin_libs.swingcallback import SwingCallback
-
+from burp_plugin_libs.readonlytablemodel import ReadOnlyTableModel
 
 
 
