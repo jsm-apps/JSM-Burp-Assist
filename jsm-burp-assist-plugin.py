@@ -16,6 +16,7 @@ from javax.swing import JOptionPane
 from burp_plugin_libs.taskmanager import *
 from burp_plugin_libs.techdetect import OllamaWorker
 from burp_plugin_libs.menuitems import MenuItems
+from burp_plugin_libs.utils import Utils
 
 class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
@@ -24,6 +25,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
         self._helpers = callbacks.getHelpers()
         self._stdout = callbacks.getStdout()
         self._stderr = callbacks.getStderr()
+        self.utils = Utils(self._print, self._print_err, self._helpers)
 
         callbacks.setExtensionName("JSM Burp Assist")
         self._results_manager = ResultsTabManager(
@@ -44,41 +46,9 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
         mi = MenuItems(invocation)
         return mi.getMenuItems(self._handle_tech_detect, self._handle_xss_detection, self._handle_question)
 
-    def get_selected_url_and_response(self, invocation):
-        messages = invocation.getSelectedMessages()
-
-        if not messages or len(messages) == 0:
-            self._print("No message selected.")
-            return None, None
-
-        message = messages[0]
-        service = message.getHttpService()
-
-        request = message.getRequest()
-        analysed = self._helpers.analyzeRequest(
-            service,
-            request
-        )
-
-        url = str(analysed.getUrl())
-
-        response = message.getResponse()
-
-        if response is None:
-            self._print_err(
-                "Selected item has no HTTP response."
-            )
-            return url, None
-
-        raw_http_response = self._helpers.bytesToString(
-            response
-        )
-
-        return url, raw_http_response, message
-
     def _run_menuitem(self, invocation, path, question = None):
         try:
-            url, raw_http_response, message = self.get_selected_url_and_response(invocation)
+            url, raw_http_response, message = self.utils.get_selected_url_and_response(invocation)
 
             if url is None or raw_http_response is None:
                 return
@@ -131,7 +101,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
             JOptionPane.showMessageDialog(
                 None,
                 "Please enter a question.",
-                "No Question",
+                "No Question Given",
                 JOptionPane.WARNING_MESSAGE
             )
             return
