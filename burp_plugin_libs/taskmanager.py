@@ -14,6 +14,8 @@ from java.lang import Runnable
 from java.text import SimpleDateFormat
 from java.util import Date, UUID
 
+from burp_plugin_libs.swingcallback import SwingCallback
+
 def to_unicode(value):
     if value is None:
         return u""
@@ -26,17 +28,7 @@ def to_unicode(value):
     except UnicodeDecodeError:
         return unicode(value, "utf-8", "replace")
 
-class SwingCallback(Runnable):
-    """
-    Wraps a Python callable so it can safely be passed to
-    SwingUtilities.invokeLater().
-    """
 
-    def __init__(self, callback):
-        self.callback = callback
-
-    def run(self):
-        self.callback()
 
 
 class ReadOnlyTableModel(DefaultTableModel):
