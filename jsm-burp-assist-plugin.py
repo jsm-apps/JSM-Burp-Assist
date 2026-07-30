@@ -106,7 +106,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
             return
         self._run_menuitem(invocation, "/ai/ask-question", question)
 
-    def _handle_send_to_intruder(self):
+    def _handle_send_to_intruder(self, invocation):
         url, raw_http_request, message = self.utils.get_selected_url_and_request(invocation)
         self._results_manager.intruder_tab.setHTTPRequestText(raw_http_request)
         
