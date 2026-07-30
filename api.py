@@ -14,7 +14,7 @@ ollama_host = "http://localhost:11434"
 ollama_client = Client(host=ollama_host)
 
 def load_from_file(filename):
-    base = "/home/g/Documents/JSM/code/JSM-Burp-Assist/prompts"
+    base = "./prompts"
     path = os.path.join(base, filename)
 
     print("Looking for:", path)
