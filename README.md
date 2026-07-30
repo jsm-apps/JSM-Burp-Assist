@@ -18,6 +18,6 @@ Press CTRL+C to quit
  * Restarting with stat
  * Debugger is active!
 
-# Open to job offers
+# Open to job opportunities
 
-I am currently looking for a job. If you have a job opening regarding AI or Pentesting, please reach out via my Linkedin - https://www.linkedin.com/in/michael-minchinton-2a5091273/
+I am currently looking for a new role. If you have an opening in AI or penetration testing, please feel free to reach out via LinkedIn: https://www.linkedin.com/in/michael-minchinton-2a5091273/
