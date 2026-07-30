@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from java.awt.event import ActionListener
+from java.awt import BorderLayout
 from javax.swing import (
     JPanel,
     JLabel,
@@ -10,6 +11,37 @@ from javax.swing import (
     JTextArea,
     JTextField
 )
+
+
+
+
+class IntruderWindow(ActionListener):
+    def actionPerformed(self, event):
+        frame = JFrame("JSM Intruder")
+        frame.setSize(400, 300)
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE)
+        frame.setLayout(BorderLayout())
+
+        north_panel = JPanel()
+        north_panel.setLayout(FlowLayout())
+
+        target_label = JLabel("Target : xxx")
+        btn_start = JButton("Start")
+        btn_pause = JButton("Pause")
+        btn_unpause = JButton("Resume")
+
+        
+        
+        north_panel.add(target_label)
+        north_panel.add(btn_start)
+        north_panel.add(btn_pause)
+        north_panel.add(btn_unpause)
+
+        frame.add(north_panel, BorderLayout.NORTH)
+
+        frame.setLocationRelativeTo(None)  # Centre on screen
+        frame.setVisible(True)
+
 
 
 MARKER = u"\u00A7"
@@ -94,7 +126,7 @@ class IntruderTab(object):
 
         run_button = JButton("Start Intruder...")
         run_button.setBounds(10, 500, 220, 30)
-        #run_button.addActionListener(ClearMarkerAction(self._details_area))
+        run_button.addActionListener(IntruderWindow())
         self._panel.add(run_button)
 
 
