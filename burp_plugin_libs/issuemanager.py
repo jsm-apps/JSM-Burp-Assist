@@ -11,6 +11,8 @@ from javax.swing import (
 from java.util import Date, UUID
 from burp_plugin_libs.readonlytablemodel import ReadOnlyTableModel
 from burp_plugin_libs.swingcallback import SwingCallback
+from burp_plugin_libs.issueselectionlistener import IssueSelectionListener
+
 
 def to_unicode(value):
     if value is None:

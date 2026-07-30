@@ -1,5 +1,17 @@
 
+from javax.swing import (
+    JPanel,
+    JScrollPane,
+    JTable,
+    JTabbedPane,
+    JSplitPane,
+    JTextArea,
+    SwingUtilities
+)
+
 from burp_plugin_libs.swingcallback import SwingCallback
+from burp_plugin_libs.taskmanager import TaskManager
+from burp_plugin_libs.issuemanager import IssueManager
 
 class ResultsTabManager(object):
     """
