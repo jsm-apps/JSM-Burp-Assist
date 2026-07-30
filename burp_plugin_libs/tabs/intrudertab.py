@@ -127,7 +127,7 @@ class IntruderTab(object):
 
         run_button = JButton("Start Intruder...")
         run_button.setBounds(10, 500, 220, 30)
-        run_button.addActionListener(IntruderWindow())
+        run_button.addActionListener(IntruderWindow(self._target_field.getText()))
         self._panel.add(run_button)
 
 
