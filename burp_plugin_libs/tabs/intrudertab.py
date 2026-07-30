@@ -82,5 +82,6 @@ class IntruderTab(object):
 
         return self._panel
 
-    def setHTTPRequestText(self, textToShow):
+    def setHTTPRequestTextAndURL(self, textToShow, url):
         self._details_area.setText(textToShow)
+        self._target_field.setText(url)
