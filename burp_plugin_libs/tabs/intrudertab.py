@@ -35,7 +35,7 @@ class IntruderTab(object):
         self._details_area.setEditable(True)
         self._details_area.setLineWrap(False)
         details_scroll = JScrollPane(self._details_area)
-        details_scroll.setBounds(10, 150, 120, 30)
+        details_scroll.setBounds(10, 150, 900, 300)
         self._panel.add(details_scroll)
 
 
