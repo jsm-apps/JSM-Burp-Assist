@@ -26,19 +26,13 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
         self._stderr = callbacks.getStderr()
 
         callbacks.setExtensionName("JSM Burp Assist")
-
         self._results_manager = ResultsTabManager(
             error_callback=self._print_err
         )
-
         self._main_panel = self._results_manager.build_ui()
-
         callbacks.addSuiteTab(self)
         callbacks.registerContextMenuFactory(self)
-
         self._print("Extension loaded successfully.")
-
-    
 
     def getTabCaption(self):
         return "JSM Assist"
@@ -82,111 +76,18 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
         return url, raw_http_response, message
 
-    def _handle_tech_detect(self, invocation):
+    def _run_menuitem(self, invocation, path, question = None):
         try:
             url, raw_http_response, message = self.get_selected_url_and_response(invocation)
 
             if url is None or raw_http_response is None:
                 return
 
-            self._print(
-                "Tech detection for {}".format(url)
-            )
-
             task_id = self._results_manager.create_task(url)
             self._results_manager.set_task_processing(task_id)
 
             worker = OllamaWorker(
-                path="/ai/techdetect",
-                task_id=task_id,
-                url=url,
-                message=message,
-                question=None,
-                raw_response=raw_http_response,
-                on_complete=self.ollama_complete,
-                on_error=self.ollama_failed
-            )
-            worker.start()
-
-        except Exception as ex:
-            self._print_err(
-                "JSM Error @ _handle_tech_detect: {}".format(
-                    str(ex)
-                )
-            )
-
-    def _handle_xss_detection(self, invocation):
-        try:
-            url, raw_http_response, message = self.get_selected_url_and_response(invocation)
-
-            if url is None or raw_http_response is None:
-                return
-
-            self._print(
-                "XSS detection for {}".format(url)
-            )
-
-            task_id = self._results_manager.create_task(url)
-            self._results_manager.set_task_processing(task_id)
-
-            worker = OllamaWorker(
-                path="/ai/xssdetect",
-                task_id=task_id,
-                url=url,
-                message=message,
-                question=None,
-                raw_response=raw_http_response,
-                on_complete=self.ollama_complete,
-                on_error=self.ollama_failed
-            )
-            worker.start()
-
-        except Exception as ex:
-            self._print_err(
-                "JSM Error @ _handle_xss_detect: {}".format(
-                    str(ex)
-                )
-            )
-
-
-    def _handle_question(self, invocation):
-        try:
-            url, raw_http_response, message = self.get_selected_url_and_response(invocation)
-
-            if url is None or raw_http_response is None:
-                return
-
-            question = JOptionPane.showInputDialog(
-                None,
-                "Enter your question:",
-                "Ask AI",
-                JOptionPane.QUESTION_MESSAGE
-            )
-
-            # User pressed Cancel
-            if question is None:
-                return
-
-            question = question.strip()
-
-            # Empty question
-            if len(question) == 0:
-                JOptionPane.showMessageDialog(
-                    None,
-                    "Please enter a question.",
-                    "No Question",
-                    JOptionPane.WARNING_MESSAGE
-                )
-                return
-
-            self._print("Question for {}: {}".format(url, question))
-
-
-            task_id = self._results_manager.create_task(url)
-            self._results_manager.set_task_processing(task_id)
-
-            worker = OllamaWorker(
-                path="/ai/ask-question",
+                path=path,
                 task_id=task_id,
                 url=url,
                 message=message,
@@ -199,10 +100,43 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
         except Exception as ex:
             self._print_err(
-                "JSM Error @ _handle_question: {}".format(
+                "JSM Error @ _run_menuitem - {}: {}".format(
+                    path,
                     str(ex)
                 )
             )
+
+    def _handle_tech_detect(self, invocation):
+        self._run_menuitem(invocation, "/ai/techdetect")
+
+    def _handle_xss_detection(self, invocation):
+        self._run_menuitem(invocation, "/ai/xssdetect")
+
+    def _handle_question(self, invocation):
+        question = JOptionPane.showInputDialog(
+            None,
+            "Enter your question:",
+            "Ask AI",
+            JOptionPane.QUESTION_MESSAGE
+        )
+
+        # User pressed Cancel
+        if question is None:
+            return
+
+        question = question.strip()
+
+        # Empty question
+        if len(question) == 0:
+            JOptionPane.showMessageDialog(
+                None,
+                "Please enter a question.",
+                "No Question",
+                JOptionPane.WARNING_MESSAGE
+            )
+            return
+        self._run_menuitem(invocation, "/ai/ask-question", question)
+        
 
     def ollama_complete(self, task_id, message, result):
         self._results_manager.complete_task(task_id)
