@@ -61,7 +61,7 @@ class IntruderTab(object):
 
         self._target_field = JTextField()
         self._target_field.setEditable(False)
-        self._target_field.setBounds(70, 50, 300, 25)
+        self._target_field.setBounds(70, 50, 700, 25)
         self._panel.add(self._target_field)
 
         add_button = JButton("Add $")
