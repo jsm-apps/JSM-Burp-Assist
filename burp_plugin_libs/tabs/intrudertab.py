@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from java.awt.event import ActionListener
-from java.awt import BorderLayout
+from java.awt import BorderLayout, FlowLayout
 from javax.swing import (
     JPanel,
     JLabel,
