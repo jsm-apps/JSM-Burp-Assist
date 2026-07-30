@@ -26,7 +26,7 @@ class IntruderTab(object):
         self._panel.add(add_button)
 
         clear_button = JButton("Clear $")
-        clear_button.setBounds(80, 50, 120, 30)
+        clear_button.setBounds(180, 50, 120, 30)
         self._panel.add(clear_button)
 
         return self._panel
