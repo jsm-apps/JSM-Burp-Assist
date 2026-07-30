@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from java.awt.event import ActionListener
 from javax.swing import (
     JPanel,
@@ -7,8 +9,9 @@ from javax.swing import (
     JScrollPane,
     JTextArea
 )
-import re
 
+
+MARKER = u"\u00A7"
 
 class AddMarkerAction(ActionListener):
     def __init__(self, text_area):
@@ -23,8 +26,8 @@ class AddMarkerAction(ActionListener):
             return
 
         selected = self._text_area.getSelectedText()
-        replacement = u"\u00A7%s\u00A7" % selected
-
+        replacement = u"%s%s%s" % (MARKER, selected, MARKER)
+        
         self._text_area.replaceRange(replacement, start, end)
         self._text_area.select(start, start + len(replacement))
 
@@ -34,10 +37,7 @@ class ClearMarkerAction(ActionListener):
 
     def actionPerformed(self, event):
         text = self._text_area.getText()
-
-        # Replace §text§ with text
-        text = re.sub(u"\u00A7(.*?)\u00A7", r"\1", text)
-
+        text = text.replace(u"\u00A7", u"")
         self._text_area.setText(text)
 
 class IntruderTab(object):
