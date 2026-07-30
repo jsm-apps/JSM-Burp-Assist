@@ -15,6 +15,7 @@ from javax.swing import JOptionPane
 
 from burp_plugin_libs.taskmanager import *
 from burp_plugin_libs.techdetect import OllamaWorker
+from burp_plugin_libs.menuitems import MenuItems
 
 class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
@@ -46,32 +47,8 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
         return self._main_panel
 
     def createMenuItems(self, invocation):
-        menu = ArrayList()
-
-        item = JMenuItem(
-            "Technology Detect",
-            actionPerformed=lambda event:
-                self._handle_tech_detect(invocation)
-        )
-
-        menu.add(item)
-
-        item2 = JMenuItem(
-                    "XSS Detection",
-                    actionPerformed=lambda event:
-                        self._handle_xss_detection(invocation)
-                )
-        
-        menu.add(item2)
-
-        item3 = JMenuItem(
-                            "Ask Question...",
-                            actionPerformed=lambda event:
-                                self._handle_question(invocation)
-                        )
-                
-        menu.add(item3)
-        return menu
+        mi = MenuItems(invocation)
+        return mi.getMenuItems(self._handle_tech_detect, self._handle_xss_detection, self._handle_question)
 
     def get_selected_url_and_response(self, invocation):
         messages = invocation.getSelectedMessages()
