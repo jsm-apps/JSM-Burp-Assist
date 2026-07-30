@@ -89,7 +89,7 @@ class IntruderTab(object):
         self._details_area.setEditable(True)
         self._details_area.setLineWrap(False)
         details_scroll = JScrollPane(self._details_area)
-        details_scroll.setBounds(10, 190, 900, 300)
+        details_scroll.setBounds(20, 190, 900, 300)
         self._panel.add(details_scroll)
 
         run_button = JButton("Start Intruder...")
