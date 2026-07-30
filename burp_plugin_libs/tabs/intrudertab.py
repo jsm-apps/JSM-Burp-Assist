@@ -64,20 +64,32 @@ class IntruderTab(object):
         self._target_field.setBounds(70, 50, 700, 25)
         self._panel.add(self._target_field)
 
+        delay_label = JLabel("Delay between requests:")
+        delay_label.setBounds(10, 90, 150, 25)
+        self._panel.add(delay_label)
+
+        self._delay_field = JTextField("0")
+        self._delay_field.setBounds(165, 90, 80, 25)
+        self._panel.add(self._delay_field)
+
+        milliseconds_label = JLabel("milliseconds")
+        milliseconds_label.setBounds(255, 90, 100, 25)
+        self._panel.add(milliseconds_label)
+
         add_button = JButton("Add $")
-        add_button.setBounds(10, 90, 120, 30)
+        add_button.setBounds(10, 130, 120, 30)
         add_button.addActionListener(AddMarkerAction(self._details_area))
         self._panel.add(add_button)
 
         clear_button = JButton("Clear $")
-        clear_button.setBounds(180, 90, 120, 30)
+        clear_button.setBounds(180, 130, 120, 30)
         clear_button.addActionListener(ClearMarkerAction(self._details_area))
         self._panel.add(clear_button)
 
         self._details_area.setEditable(True)
         self._details_area.setLineWrap(False)
         details_scroll = JScrollPane(self._details_area)
-        details_scroll.setBounds(10, 150, 900, 300)
+        details_scroll.setBounds(10, 190, 900, 300)
         self._panel.add(details_scroll)
 
 
