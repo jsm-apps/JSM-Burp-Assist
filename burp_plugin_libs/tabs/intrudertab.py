@@ -93,7 +93,7 @@ class IntruderTab(object):
         self._panel.add(details_scroll)
 
         run_button = JButton("Start Intruder...")
-        run_button.setBounds(10, 250, 120, 30)
+        run_button.setBounds(10, 450, 120, 30)
         #run_button.addActionListener(ClearMarkerAction(self._details_area))
         self._panel.add(run_button)
 
