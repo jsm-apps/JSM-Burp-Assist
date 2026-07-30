@@ -17,6 +17,7 @@ from burp_plugin_libs.taskmanager import *
 from burp_plugin_libs.techdetect import OllamaWorker
 from burp_plugin_libs.menuitems import MenuItems
 from burp_plugin_libs.utils import Utils
+from burp_plugin_libs.resultstabmanager import ResultsTabManager
 
 class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
