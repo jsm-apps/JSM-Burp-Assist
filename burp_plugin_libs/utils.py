@@ -35,3 +35,33 @@ class Utils():
         )
 
         return url, raw_http_response, message
+
+    def get_selected_url_and_request(self, invocation):
+        messages = invocation.getSelectedMessages()
+
+        if not messages or len(messages) == 0:
+            self._print("No message selected.")
+            return None, None
+
+        message = messages[0]
+        service = message.getHttpService()
+
+        request = message.getRequest()
+        analysed = self._helpers.analyzeRequest(
+            service,
+            request
+        )
+
+        url = str(analysed.getUrl())
+
+        if request is None:
+            self._print_err(
+                "Selected item has no HTTP request."
+            )
+            return url, None
+
+        raw_http_request = self._helpers.bytesToString(
+            request
+        )
+
+        return url, raw_http_request, message

@@ -40,3 +40,6 @@ class IntruderTab(object):
 
 
         return self._panel
+
+    def setHTTPRequestText(self, textToShow):
+        self._details_area.setText(textToShow)
