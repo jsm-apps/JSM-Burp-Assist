@@ -3,7 +3,9 @@ from javax.swing import (
     JPanel,
     JLabel,
     JButton,
-    JFrame
+    JFrame,
+    JScrollPane,
+    JTextArea
 )
 
 
@@ -28,5 +30,12 @@ class IntruderTab(object):
         clear_button = JButton("Clear $")
         clear_button.setBounds(180, 50, 120, 30)
         self._panel.add(clear_button)
+
+        self._details_area = JTextArea()
+        self._details_area.setEditable(True)
+        self._details_area.setLineWrap(False)
+        details_scroll = JScrollPane(self._details_area)
+        self._panel.add(details_scroll)
+
 
         return self._panel
