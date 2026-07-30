@@ -16,6 +16,9 @@ from javax.swing import (
 
 
 class IntruderWindow(ActionListener):
+    def __init__(self, target):
+        self.target = target
+
     def actionPerformed(self, event):
         frame = JFrame("JSM Intruder")
         frame.setSize(400, 300)
@@ -25,12 +28,10 @@ class IntruderWindow(ActionListener):
         north_panel = JPanel()
         north_panel.setLayout(FlowLayout())
 
-        target_label = JLabel("Target : xxx")
+        target_label = JLabel("Target : " + self.target)
         btn_start = JButton("Start")
         btn_pause = JButton("Pause")
         btn_unpause = JButton("Resume")
-
-        
         
         north_panel.add(target_label)
         north_panel.add(btn_start)
