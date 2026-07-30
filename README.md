@@ -20,4 +20,4 @@ Press CTRL+C to quit
 
 # Open to job offers
 
-I am currently looking for a job, if you have a job opening regarding AI/Pentesting, please reach out via my Linkedin - https://www.linkedin.com/in/michael-minchinton-2a5091273/
+I am currently looking for a job. If you have a job opening regarding AI or Pentesting, please reach out via my Linkedin - https://www.linkedin.com/in/michael-minchinton-2a5091273/
