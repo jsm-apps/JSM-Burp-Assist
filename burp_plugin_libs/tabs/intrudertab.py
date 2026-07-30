@@ -54,13 +54,21 @@ class IntruderTab(object):
         label.setBounds(10, 10, 200, 25)
         self._panel.add(label)
 
+        target_label = JLabel("Target:")
+        target_label.setBounds(10, 50, 60, 25)
+        self._panel.add(target_label)
+
+        self._target_field = JTextField()
+        self._target_field.setBounds(70, 50, 300, 25)
+        self._panel.add(self._target_field)
+
         add_button = JButton("Add $")
-        add_button.setBounds(10, 50, 120, 30)
+        add_button.setBounds(10, 90, 120, 30)
         add_button.addActionListener(AddMarkerAction(self._details_area))
         self._panel.add(add_button)
 
         clear_button = JButton("Clear $")
-        clear_button.setBounds(180, 50, 120, 30)
+        clear_button.setBounds(180, 90, 120, 30)
         clear_button.addActionListener(ClearMarkerAction(self._details_area))
         self._panel.add(clear_button)
 
