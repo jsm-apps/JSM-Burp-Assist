@@ -84,7 +84,7 @@ class IntruderStartAction(ActionListener):
         return u"".join(result)
 
     def makeRequest(self, http_request):
-        baseurl = target.getText()
+        baseurl = self.target.getText()
         if not baseurl:
             return
 
