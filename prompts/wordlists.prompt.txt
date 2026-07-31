@@ -1,6 +1,14 @@
 Generate exactly 20 realistic filenames.
 
-Return only JSON matching the provided schema.
+Return ONLY JSON in this format:
+
+{
+  "items": [
+    "file1.txt",
+    "file2.log"
+  ]
+}
+
 Do not use markdown.
-Do not wrap the JSON in ``` fences.
+Do not wrap the JSON in code fences.
 Do not include any explanation.
