@@ -15,6 +15,25 @@ from javax.swing import (
 )
 from burp_plugin_libs.readonlytablemodel import ReadOnlyTableModel
 
+class IntruderStartAction(ActionListener):
+    def __init__(self, results_table):
+        self.results_table = results_table
+        self.payloads=[
+            "Logout",
+            "Logoff",
+            "Signout",
+        ]
+
+    def actionPerformed(self, event):
+        for x in self.payloads:
+            row = [
+                1,
+                x,
+                200,
+                1234
+            ]
+
+            self.results_table.addRow(row)
 
 
 class IntruderWindow(ActionListener):
@@ -61,8 +80,8 @@ class IntruderWindow(ActionListener):
         south_panel = JPanel()
         south_panel.setLayout(FlowLayout())
 
-        http_request_textarea = JTextArea(10, 30)
-        http_response_textarea = JTextArea(10, 30)
+        http_request_textarea = JTextArea(15, 50)
+        http_response_textarea = JTextArea(15, 50)
 
         south_panel.add(JScrollPane(http_request_textarea))
         south_panel.add(JScrollPane(http_response_textarea))
@@ -71,6 +90,8 @@ class IntruderWindow(ActionListener):
         frame.add(north_panel, BorderLayout.NORTH)
         frame.add(centre_panel, BorderLayout.CENTER)
         frame.add(south_panel, BorderLayout.SOUTH)
+
+        btn_start.addActionListener(IntruderStartAction(self._table))
 
         frame.setLocationRelativeTo(None)  # Centre on screen
         frame.setVisible(True)
