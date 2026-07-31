@@ -137,6 +137,8 @@ def generate_wordlist(prompt_file, task_id):
             format=WordList.model_json_schema()
         )
 
+        print(response)
+
         # Support both object-style and dictionary-style responses.
         if hasattr(response, "response"):
             summary = response.response
