@@ -42,7 +42,7 @@ class IntruderWindow(ActionListener):
 
     def actionPerformed(self, event):
         frame = JFrame("JSM Intruder")
-        frame.setSize(800, 600)
+        frame.setSize(1200, 800)
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE)
         frame.setLayout(BorderLayout())
 
