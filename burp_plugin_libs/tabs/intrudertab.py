@@ -38,52 +38,53 @@ class IntruderWorker(Runnable):
     def __init__(
         self,
         http_request_template,
-        payloads,
         apply_payload,
         make_request,
         results_tablemodel
     ):
         self._http_request_template = http_request_template
-        self._payloads = payloads
+        self.client = TaskApiClient()
         self._apply_payload = apply_payload
         self._make_request = make_request
         self._results_tablemodel = results_tablemodel
 
     def run(self):
-        for index, payload in enumerate(self._payloads):
-            try:
-                raw_request = self._apply_payload(
-                    self._http_request_template,
-                    payload
+        while(True):
+            payloads = self.client.generate_wordlist()
+            for index, payload in enumerate(payloads):
+                try:
+                    raw_request = self._apply_payload(
+                        self._http_request_template,
+                        payload
+                    )
+
+                    status_code, response_length, request_bytes, response_bytes = self._make_request(
+                        raw_request
+                    )
+
+                    row = [
+                        index,
+                        payload,
+                        status_code,
+                        response_length,
+                        request_bytes,
+                        response_bytes
+                    ]
+
+                except Exception as ex:
+                    row = [
+                        index,
+                        payload,
+                        "Error",
+                        str(ex)
+                    ]
+
+                SwingUtilities.invokeLater(
+                    AddResultRow(
+                        self._results_tablemodel,
+                        row
+                    )
                 )
-
-                status_code, response_length, request_bytes, response_bytes = self._make_request(
-                    raw_request
-                )
-
-                row = [
-                    index,
-                    payload,
-                    status_code,
-                    response_length,
-                    request_bytes,
-                    response_bytes
-                ]
-
-            except Exception as ex:
-                row = [
-                    index,
-                    payload,
-                    "Error",
-                    str(ex)
-                ]
-
-            SwingUtilities.invokeLater(
-                AddResultRow(
-                    self._results_tablemodel,
-                    row
-                )
-            )
 
 class IntruderStartAction(ActionListener):
     def __init__(self, callbacks, helpers, results_tablemodel, target, http_request_template):
@@ -92,8 +93,6 @@ class IntruderStartAction(ActionListener):
         self.results_tablemodel = results_tablemodel
         self.target = target
         self.http_request_template = http_request_template
-        client = TaskApiClient()
-        self.payloads=client.generate_wordlist()
         self.results = []
 
     def actionPerformed(self, event):
@@ -101,7 +100,6 @@ class IntruderStartAction(ActionListener):
 
         worker = IntruderWorker(
             http_request_template=raw_http_request_template,
-            payloads=list(self.payloads),
             apply_payload=self.apply_payload,
             make_request=self.makeRequest,
             results_tablemodel=self.results_tablemodel
