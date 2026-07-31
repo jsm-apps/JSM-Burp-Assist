@@ -12,12 +12,13 @@ import json
 
 from pydantic import BaseModel
 
+from ai_libs.wordlistgenerator import WordlistGenerator
+
 model = "aratan/qwen3.5-uncensored:9b"
 ollama_host = "http://localhost:11434"
 ollama_client = Client(host=ollama_host)
 
-class WordList(BaseModel):
-    items: list[str]
+
 
 def load_from_file(filename):
     base = "./prompts"
@@ -128,54 +129,11 @@ def process_ai_task(prompt_file, task_id, url, raw_response):
 
 
 
-def generate_wordlist(prompt_file, task_id):
-    try:
-        system_prompt = load_from_file(prompt_file)
-        messages=[
-            {
-                "role": "system",
-                "content": system_prompt
-            }
-        ]
-  
-        response = ollama_client.chat(
-            model=model,
-            messages=messages,
-            format=WordList.model_json_schema(),
-            think=False
-        )
 
-        print(response)
-
-        content = (
-            response.message.content
-            if hasattr(response, "message")
-            else response["message"]["content"]
-        )
-
-        word_list = WordList.model_validate_json(content)
-
-        
-
-        result = {
-            "task_id": task_id,
-            "status": "complete",
-            "details": word_list.items,
-        }
-
-        with tasks_lock:
-            tasks[task_id] = result
-
-    except Exception as exc:
-        with tasks_lock:
-            tasks[task_id] = {
-                "task_id": task_id,
-                "status": "error",
-                "error": str(exc),
-            }
 
 @app.route("/ai/wordlist", methods=["GET"])
 def get_wordlist():
+    generator = WordlistGenerator(tasks, tasks_lock)
     task_id = str(uuid.uuid4())
     
     with tasks_lock:
@@ -185,7 +143,7 @@ def get_wordlist():
         }
 
     worker = threading.Thread(
-        target=generate_wordlist,
+        target=generator.generate_wordlist,
         args=("wordlists.prompt.txt", task_id),
         daemon=True,
     )
