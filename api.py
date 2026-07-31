@@ -131,34 +131,39 @@ def process_ai_task(prompt_file, task_id, url, raw_response):
 def generate_wordlist(prompt_file, task_id):
     try:
         system_prompt = load_from_file(prompt_file)
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a helpful assistant. Return only the requested JSON."
+            },
+            {
+                "role": "user",
+                "content": system_prompt
+            }
+        ]
   
-        response = ollama_client.generate(
+        response = ollama_client.chat(
             model=model,
+            messages=messages,
             prompt=system_prompt,
             format=WordList.model_json_schema(),
             think=False
         )
 
-        print(response)
+        content = (
+            response.message.content
+            if hasattr(response, "message")
+            else response["message"]["content"]
+        )
 
-        # Support both object-style and dictionary-style responses.
-        if hasattr(response, "response"):
-            aitext = response.response
-        else:
-            aitext = response.get("response")
+        word_list = WordList.model_validate_json(content)
 
-        if not aitext:
-            raise RuntimeError(
-                "Ollama returned an empty summary"
-            )
-
-        obj = json.loads(aitext)
-        items = obj["items"]
+        
 
         result = {
             "task_id": task_id,
             "status": "complete",
-            "details": items,
+            "details": word_list.items,
         }
 
         with tasks_lock:
