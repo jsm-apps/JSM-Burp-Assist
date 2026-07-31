@@ -135,10 +135,6 @@ def generate_wordlist(prompt_file, task_id):
             {
                 "role": "system",
                 "content": system_prompt
-            },
-            {
-                "role": "user",
-                "content": "generate list and return as json"
             }
         ]
   
