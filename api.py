@@ -128,7 +128,7 @@ def generate_wordlist(prompt_file, task_id):
   
         response = ollama_client.generate(
             model=model,
-            prompt=full_prompt
+            prompt=system_prompt
         )
 
         # Support both object-style and dictionary-style responses.
