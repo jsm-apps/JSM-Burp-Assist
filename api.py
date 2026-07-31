@@ -8,6 +8,7 @@ from flask import Flask, jsonify, request, redirect, url_for
 from ollama import Client
 import requests
 import os
+import json
 
 from pydantic import BaseModel
 
@@ -142,19 +143,22 @@ def generate_wordlist(prompt_file, task_id):
 
         # Support both object-style and dictionary-style responses.
         if hasattr(response, "response"):
-            summary = response.response
+            aitext = response.response
         else:
-            summary = response.get("response")
+            aitext = response.get("response")
 
-        if not summary:
+        if not aitext:
             raise RuntimeError(
                 "Ollama returned an empty summary"
             )
 
+        obj = json.loads(aitext)
+        items = obj["items"]
+
         result = {
             "task_id": task_id,
             "status": "complete",
-            "details": summary.strip(),
+            "details": items,
         }
 
         with tasks_lock:
