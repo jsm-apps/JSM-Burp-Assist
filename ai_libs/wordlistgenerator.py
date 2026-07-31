@@ -26,25 +26,23 @@ class WordlistGenerator():
     def __init__(self, tasks, tasks_lock):
         self.tasks = tasks
         self.tasks_lock = tasks_lock
+        system_prompt = load_from_file(prompt_file)
+        self.messages=[{"role": "system", "content": system_prompt}]
 
     def generate_wordlist(self, prompt_file, task_id):
         try:
-            system_prompt = load_from_file(prompt_file)
-            messages=[
-                {
-                    "role": "system",
-                    "content": system_prompt
-                }
-            ]
-    
+            #if(len(self.messages) > 1):
+            self.messages.append({"role": "user", "content": "Known files: Logout.aspx"})
+
+
             response = ollama_client.chat(
                 model=model,
-                messages=messages,
+                messages=self.messages,
                 format=WordList.model_json_schema(),
                 think=False
             )
 
-            print(response)
+            #print(response)
 
             content = (
                 response.message.content
@@ -53,6 +51,12 @@ class WordlistGenerator():
             )
 
             word_list = WordList.model_validate_json(content)
+
+            self.messages.append({
+                "role": "assistant",
+                "content": content
+            })
+
 
             
 

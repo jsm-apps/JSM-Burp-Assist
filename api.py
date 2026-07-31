@@ -96,6 +96,7 @@ app = Flask(__name__)
 # Replace this with Redis or a database for production use.
 tasks = {}
 tasks_lock = threading.Lock()
+generator = WordlistGenerator(tasks, tasks_lock)
 
 
 def process_ai_task(prompt_file, task_id, url, raw_response):
@@ -133,7 +134,6 @@ def process_ai_task(prompt_file, task_id, url, raw_response):
 
 @app.route("/ai/wordlist", methods=["GET"])
 def get_wordlist():
-    generator = WordlistGenerator(tasks, tasks_lock)
     task_id = str(uuid.uuid4())
     
     with tasks_lock:
