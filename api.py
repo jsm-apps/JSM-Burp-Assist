@@ -9,9 +9,14 @@ from ollama import Client
 import requests
 import os
 
+from pydantic import BaseModel
+
 model = "aratan/qwen3.5-uncensored:9b"
 ollama_host = "http://localhost:11434"
 ollama_client = Client(host=ollama_host)
+
+class WordList(BaseModel):
+    items: list[str]
 
 def load_from_file(filename):
     base = "./prompts"
@@ -128,7 +133,8 @@ def generate_wordlist(prompt_file, task_id):
   
         response = ollama_client.generate(
             model=model,
-            prompt=system_prompt
+            prompt=system_prompt,
+            format=WordList.model_json_schema()
         )
 
         # Support both object-style and dictionary-style responses.
