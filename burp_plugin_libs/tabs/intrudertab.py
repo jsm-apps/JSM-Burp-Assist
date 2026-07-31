@@ -14,12 +14,72 @@ from javax.swing import (
     
 )
 
+from java.lang import Runnable, Thread
+from javax.swing import SwingUtilities
+
 from urlparse import urlparse
 
 from burp_plugin_libs.readonlytablemodel import ReadOnlyTableModel
 
 
 MARKER = u"\u00A7"
+
+class AddResultRow(Runnable):
+    def __init__(self, table_model, row):
+        self._table_model = table_model
+        self._row = row
+
+    def run(self):
+        self._table_model.addRow(self._row)
+
+class IntruderWorker(Runnable):
+    def __init__(
+        self,
+        http_request_template,
+        payloads,
+        apply_payload,
+        make_request,
+        results_tablemodel
+    ):
+        self._http_request_template = http_request_template
+        self._payloads = payloads
+        self._apply_payload = apply_payload
+        self._make_request = make_request
+        self._results_tablemodel = results_tablemodel
+
+    def run(self):
+        for index, payload in enumerate(self._payloads):
+            try:
+                raw_request = self._apply_payload(
+                    self._http_request_template,
+                    payload
+                )
+
+                status_code, response_length = self._make_request(
+                    raw_request
+                )
+
+                row = [
+                    index,
+                    payload,
+                    status_code,
+                    response_length
+                ]
+
+            except Exception as ex:
+                row = [
+                    index,
+                    payload,
+                    "Error",
+                    str(ex)
+                ]
+
+            SwingUtilities.invokeLater(
+                AddResultRow(
+                    self._results_tablemodel,
+                    row
+                )
+            )
 
 class IntruderStartAction(ActionListener):
     def __init__(self, callbacks, helpers, results_tablemodel, target, http_request_template):
@@ -37,19 +97,19 @@ class IntruderStartAction(ActionListener):
 
     def actionPerformed(self, event):
         raw_http_request_template = self.http_request_template.getText()
-        for index, payload in enumerate(self.payloads):
-            
-            raw_request = self.apply_payload(raw_http_request_template, payload)
-            status_code, response_length = self.makeRequest(raw_request)
 
-            row = [
-                index,
-                payload,
-                status_code,
-                response_length
-            ]
+        worker = IntruderWorker(
+            http_request_template=raw_http_request_template,
+            payloads=list(self.payloads),
+            apply_payload=self.apply_payload,
+            make_request=self.makeRequest,
+            results_tablemodel=self.results_tablemodel
+        )
 
-            self.results_tablemodel.addRow(row)
+        Thread(
+            worker,
+            "JSM-Intruder-Worker"
+        ).start()
 
     def apply_payload(self, text_block, payload):
         """
