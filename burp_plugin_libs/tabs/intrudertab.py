@@ -9,7 +9,9 @@ from javax.swing import (
     JFrame,
     JScrollPane,
     JTextArea,
-    JTextField
+    JTextField,
+    JTable,
+    
 )
 
 
@@ -38,7 +40,26 @@ class IntruderWindow(ActionListener):
         north_panel.add(btn_pause)
         north_panel.add(btn_unpause)
 
+        centre_panel = JPanel()
+        columns = [
+            "#",
+            "Payload",
+            "Status Code",
+            "Response Length"
+        ]
+        self._table_model = ReadOnlyTableModel(columns, 0)
+        self._table = JTable(self._table_model)
+
+        self._table.setAutoCreateRowSorter(True)
+        self._table.setFillsViewportHeight(True)
+
+        scroll = JScrollPane(self._table)
+        #scroll.setBounds(10, 10, 1000, 500)
+
+        centre_panel.add(scroll)
+
         frame.add(north_panel, BorderLayout.NORTH)
+        frame.add(centre_panel, BorderLayout.CENTER)
 
         frame.setLocationRelativeTo(None)  # Centre on screen
         frame.setVisible(True)
