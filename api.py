@@ -4,7 +4,7 @@ import threading
 import time
 import uuid
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, redirect, url_for
 from ollama import Client
 import requests
 import os
@@ -121,9 +121,62 @@ def process_ai_task(prompt_file, task_id, url, raw_response):
             }
 
 
+
+def generate_wordlist(prompt_file, task_id):
+    try:
+        system_prompt = load_from_file(prompt_file)
+  
+        response = ollama_client.generate(
+            model=model,
+            prompt=full_prompt
+        )
+
+        # Support both object-style and dictionary-style responses.
+        if hasattr(response, "response"):
+            summary = response.response
+        else:
+            summary = response.get("response")
+
+        if not summary:
+            raise RuntimeError(
+                "Ollama returned an empty summary"
+            )
+
+        result = {
+            "task_id": task_id,
+            "status": "complete",
+            "details": summary.strip(),
+        }
+
+        with tasks_lock:
+            tasks[task_id] = result
+
+    except Exception as exc:
+        with tasks_lock:
+            tasks[task_id] = {
+                "task_id": task_id,
+                "status": "error",
+                "error": str(exc),
+            }
+
 @app.route("/ai/wordlist", methods=["GET"])
 def get_wordlist():
-    return "<h1>Hello</h1>"
+    task_id = str(uuid.uuid4())
+    
+    with tasks_lock:
+        tasks[task_id] = {
+            "task_id": task_id,
+            "status": "pending"
+        }
+
+    worker = threading.Thread(
+        target=generate_wordlist,
+        args=("wordlists.prompt.txt", task_id),
+        daemon=True,
+    )
+    worker.start()
+        
+    return redirect(url_for("get_task", task_id=task_id))
 
 
 
