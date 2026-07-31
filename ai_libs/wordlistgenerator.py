@@ -19,7 +19,7 @@ def load_from_file(filename):
         return f.read()
 
 class WordlistGenerator():
-    def __init__(tasks, tasks_lock):
+    def __init__(self, tasks, tasks_lock):
         self.tasks = tasks
         self.tasks_lock = tasks_lock
 
