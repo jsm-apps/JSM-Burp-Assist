@@ -13,7 +13,7 @@ from javax.swing import (
     JTable,
     
 )
-
+from burp_plugin_libs.readonlytablemodel import ReadOnlyTableModel
 
 
 
