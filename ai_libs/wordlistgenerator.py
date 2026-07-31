@@ -26,10 +26,11 @@ class WordlistGenerator():
     def __init__(self, tasks, tasks_lock):
         self.tasks = tasks
         self.tasks_lock = tasks_lock
+        prompt_file = "wordlists.prompt.txt"
         system_prompt = load_from_file(prompt_file)
         self.messages=[{"role": "system", "content": system_prompt}]
 
-    def generate_wordlist(self, prompt_file, task_id):
+    def generate_wordlist(self, task_id):
         try:
             #if(len(self.messages) > 1):
             self.messages.append({"role": "user", "content": "Known files: Logout.aspx"})
