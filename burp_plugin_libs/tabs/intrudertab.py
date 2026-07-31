@@ -23,7 +23,7 @@ class IntruderWindow(ActionListener):
 
     def actionPerformed(self, event):
         frame = JFrame("JSM Intruder")
-        frame.setSize(400, 300)
+        frame.setSize(800, 600)
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE)
         frame.setLayout(BorderLayout())
 
@@ -58,8 +58,19 @@ class IntruderWindow(ActionListener):
 
         centre_panel.add(scroll)
 
+        south_panel = JPanel()
+        south_panel.setLayout(FlowLayout())
+
+        http_request_textarea = JTextArea()
+        http_response_textarea = JTextArea()
+
+        south_panel.add(http_request_textarea)
+        south_panel.add(http_response_textarea)
+
+
         frame.add(north_panel, BorderLayout.NORTH)
         frame.add(centre_panel, BorderLayout.CENTER)
+        frame.add(south_panel, BorderLayout.SOUTH)
 
         frame.setLocationRelativeTo(None)  # Centre on screen
         frame.setVisible(True)
