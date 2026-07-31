@@ -16,8 +16,8 @@ from javax.swing import (
 from burp_plugin_libs.readonlytablemodel import ReadOnlyTableModel
 
 class IntruderStartAction(ActionListener):
-    def __init__(self, results_table):
-        self.results_table = results_table
+    def __init__(self, results_tablemodel):
+        self.results_tablemodel = results_tablemodel
         self.payloads=[
             "Logout",
             "Logoff",
@@ -33,7 +33,7 @@ class IntruderStartAction(ActionListener):
                 1234
             ]
 
-            self.results_table.addRow(row)
+            self.results_tablemodel.addRow(row)
 
 
 class IntruderWindow(ActionListener):
@@ -91,7 +91,7 @@ class IntruderWindow(ActionListener):
         frame.add(centre_panel, BorderLayout.CENTER)
         frame.add(south_panel, BorderLayout.SOUTH)
 
-        btn_start.addActionListener(IntruderStartAction(self._table))
+        btn_start.addActionListener(IntruderStartAction(self._table_model))
 
         frame.setLocationRelativeTo(None)  # Centre on screen
         frame.setVisible(True)
