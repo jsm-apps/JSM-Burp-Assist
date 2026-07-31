@@ -16,6 +16,7 @@ from javax.swing import (
 
 from java.lang import Runnable, Thread
 from javax.swing import SwingUtilities
+from javax.swing.event import ListSelectionListener
 
 from urlparse import urlparse
 
@@ -178,6 +179,57 @@ class IntruderStartAction(ActionListener):
 
 
 
+
+class IntruderRowSelectionListener(ListSelectionListener):
+    def __init__(
+        self,
+        table,
+        table_model,
+        request_textarea,
+        response_textarea
+    ):
+        self._table = table
+        self._table_model = table_model
+        self._request_textarea = request_textarea
+        self._response_textarea = response_textarea
+
+    def valueChanged(self, event):
+        # Ignore intermediate selection events.
+        if event.getValueIsAdjusting():
+            return
+
+        selected_view_row = self._table.getSelectedRow()
+
+        if selected_view_row == -1:
+            return
+
+        # Required because setAutoCreateRowSorter(True) is enabled.
+        selected_model_row = self._table.convertRowIndexToModel(
+            selected_view_row
+        )
+
+        request_value = self._table_model.getValueAt(
+            selected_model_row,
+            4
+        )
+
+        response_value = self._table_model.getValueAt(
+            selected_model_row,
+            5
+        )
+
+        if request_value is None:
+            request_value = ""
+
+        if response_value is None:
+            response_value = ""
+
+        self._request_textarea.setText(str(request_value))
+        self._response_textarea.setText(str(response_value))
+
+        self._request_textarea.setCaretPosition(0)
+        self._response_textarea.setCaretPosition(0)
+
 class IntruderWindow(ActionListener):
     def __init__(self, callbacks, helpers, target, http_request_template):
         self.callbacks = callbacks
@@ -218,6 +270,19 @@ class IntruderWindow(ActionListener):
 
         self._table.setAutoCreateRowSorter(True)
         self._table.setFillsViewportHeight(True)
+        self._table.setRowSelectionAllowed(True)
+        self._table.setColumnSelectionAllowed(False)
+
+        column_model = self._table.getColumnModel()
+
+        # Remove Response first because removing a column changes visible indexes.
+        column_model.removeColumn(
+            column_model.getColumn(5)
+        )
+
+        column_model.removeColumn(
+            column_model.getColumn(4)
+        )
 
         scroll = JScrollPane(self._table)
         #scroll.setBounds(10, 10, 1000, 500)
@@ -227,11 +292,27 @@ class IntruderWindow(ActionListener):
         south_panel = JPanel()
         south_panel.setLayout(FlowLayout())
 
-        http_request_textarea = JTextArea(15, 40)
-        http_response_textarea = JTextArea(15, 40)
+        self._http_request_textarea = JTextArea(15, 40)
+        self._http_response_textarea = JTextArea(15, 40)
 
-        south_panel.add(JScrollPane(http_request_textarea))
-        south_panel.add(JScrollPane(http_response_textarea))
+        self._http_request_textarea.setEditable(False)
+        self._http_response_textarea.setEditable(False)
+        self._http_request_textarea.setLineWrap(False)
+        self._http_response_textarea.setLineWrap(False)
+
+        south_panel.add(JScrollPane(self.http_request_textarea))
+        south_panel.add(JScrollPane(self.http_response_textarea))
+
+        selection_model = self._table.getSelectionModel()
+
+        selection_model.addListSelectionListener(
+            IntruderRowSelectionListener(
+                self._table,
+                self._table_model,
+                self._http_request_textarea,
+                self._http_response_textarea
+            )
+        )
 
 
         frame.add(north_panel, BorderLayout.NORTH)
