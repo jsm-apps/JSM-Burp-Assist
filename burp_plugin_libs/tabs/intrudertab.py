@@ -175,7 +175,7 @@ class IntruderStartAction(ActionListener):
         status_code = response_info.getStatusCode()
         response_length = len(response_bytes)
 
-        return status_code, response_length, self._helpers.bytesToString(request_bytes), self._helpers.bytesToString(response_bytes)
+        return status_code, response_length, self.helpers.bytesToString(request_bytes), self.helpers.bytesToString(response_bytes)
 
 
 
