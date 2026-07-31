@@ -144,7 +144,7 @@ def get_wordlist():
 
     worker = threading.Thread(
         target=generator.generate_wordlist,
-        args=(task_id),
+        args=(task_id,),
         daemon=True,
     )
     worker.start()
