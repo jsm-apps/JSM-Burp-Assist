@@ -300,8 +300,8 @@ class IntruderWindow(ActionListener):
         self._http_request_textarea.setLineWrap(False)
         self._http_response_textarea.setLineWrap(False)
 
-        south_panel.add(JScrollPane(self.http_request_textarea))
-        south_panel.add(JScrollPane(self.http_response_textarea))
+        south_panel.add(JScrollPane(self._http_request_textarea))
+        south_panel.add(JScrollPane(self._http_response_textarea))
 
         selection_model = self._table.getSelectionModel()
 
