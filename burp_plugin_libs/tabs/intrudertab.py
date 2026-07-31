@@ -80,8 +80,8 @@ class IntruderWindow(ActionListener):
         south_panel = JPanel()
         south_panel.setLayout(FlowLayout())
 
-        http_request_textarea = JTextArea(15, 50)
-        http_response_textarea = JTextArea(15, 50)
+        http_request_textarea = JTextArea(15, 40)
+        http_response_textarea = JTextArea(15, 40)
 
         south_panel.add(JScrollPane(http_request_textarea))
         south_panel.add(JScrollPane(http_response_textarea))
