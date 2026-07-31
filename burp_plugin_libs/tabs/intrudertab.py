@@ -167,7 +167,7 @@ class IntruderStartAction(ActionListener):
             print("No response received.")
             return
 
-        response_info = self._helpers.analyzeResponse(response_bytes)
+        response_info = self.helpers.analyzeResponse(response_bytes)
 
         status_code = response_info.getStatusCode()
         response_length = len(response_bytes)
