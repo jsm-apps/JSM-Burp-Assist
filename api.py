@@ -145,7 +145,6 @@ def generate_wordlist(prompt_file, task_id):
         response = ollama_client.chat(
             model=model,
             messages=messages,
-            prompt=system_prompt,
             format=WordList.model_json_schema(),
             think=False
         )
