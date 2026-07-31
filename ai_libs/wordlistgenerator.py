@@ -2,6 +2,10 @@ import os
 from ollama import Client
 from pydantic import BaseModel
 
+model = "aratan/qwen3.5-uncensored:9b"
+ollama_host = "http://localhost:11434"
+ollama_client = Client(host=ollama_host)
+
 class WordList(BaseModel):
     items: list[str]
 
