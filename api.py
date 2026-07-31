@@ -121,6 +121,12 @@ def process_ai_task(prompt_file, task_id, url, raw_response):
             }
 
 
+@app.route("/ai/wordlist", methods=["GET"])
+def get_wordlist():
+    return "<h1>Hello</h1>"
+
+
+
 @app.route("/ai/techdetect", methods=["POST"])
 def create_task():
     data = request.get_json(silent=True)
