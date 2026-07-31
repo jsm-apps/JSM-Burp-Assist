@@ -134,11 +134,11 @@ def generate_wordlist(prompt_file, task_id):
         messages=[
             {
                 "role": "system",
-                "content": "You are a helpful assistant. Return only the requested JSON."
+                "content": system_prompt
             },
             {
                 "role": "user",
-                "content": system_prompt
+                "content": "generate list"
             }
         ]
   
@@ -148,6 +148,8 @@ def generate_wordlist(prompt_file, task_id):
             format=WordList.model_json_schema(),
             think=False
         )
+
+        print(response)
 
         content = (
             response.message.content
