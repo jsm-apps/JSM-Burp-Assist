@@ -55,7 +55,7 @@ class IntruderWorker(Runnable):
                     payload
                 )
 
-                status_code, response_length = self._make_request(
+                status_code, response_length, request_bytes, response_bytes = self._make_request(
                     raw_request
                 )
 
@@ -63,7 +63,9 @@ class IntruderWorker(Runnable):
                     index,
                     payload,
                     status_code,
-                    response_length
+                    response_length,
+                    request_bytes,
+                    response_bytes
                 ]
 
             except Exception as ex:
@@ -172,7 +174,7 @@ class IntruderStartAction(ActionListener):
         status_code = response_info.getStatusCode()
         response_length = len(response_bytes)
 
-        return status_code, response_length
+        return status_code, response_length, request_bytes, response_bytes
 
 
 
@@ -207,7 +209,9 @@ class IntruderWindow(ActionListener):
             "#",
             "Payload",
             "Status Code",
-            "Response Length"
+            "Response Length",
+            "Request",
+            "Response"
         ]
         self._table_model = ReadOnlyTableModel(columns, 0)
         self._table = JTable(self._table_model)
