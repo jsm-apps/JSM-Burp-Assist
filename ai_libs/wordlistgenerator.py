@@ -23,7 +23,7 @@ class WordlistGenerator():
         self.tasks = tasks
         self.tasks_lock = tasks_lock
 
-    def generate_wordlist(prompt_file, task_id):
+    def generate_wordlist(self, prompt_file, task_id):
         try:
             system_prompt = load_from_file(prompt_file)
             messages=[
