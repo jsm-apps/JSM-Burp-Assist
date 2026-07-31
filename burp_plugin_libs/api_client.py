@@ -190,3 +190,57 @@ class TaskApiClient(object):
             timeout=timeout,
             status_callback=status_callback,
         )
+
+    def create_wordlist_task(self):
+        """
+        Start a wordlist generation task.
+
+        Expected response after Flask follows the redirect:
+
+            {
+                "task_id": "...",
+                "status": "pending"
+            }
+        """
+        return self._request(
+            method="POST",
+            path="/ai/wordlist",
+            data={},
+        )
+
+    def generate_wordlist(self, poll_interval=10, timeout=300, status_callback=None,):
+        """
+        Start a wordlist task and wait for the generated filenames.
+
+        Returns a normal Python list:
+
+            [
+                "Global.asax",
+                "Web.config",
+                "Default.aspx.cs"
+            ]
+        """
+        created_task = self.create_wordlist_task()
+
+        task_id = created_task.get("task_id")
+
+        if not task_id:
+            raise ApiClientError(
+                "Wordlist API response did not contain a task_id"
+            )
+
+        completed_task = self.wait_for_task(
+            task_id=task_id,
+            poll_interval=poll_interval,
+            timeout=timeout,
+            status_callback=status_callback,
+        )
+
+        details = completed_task.get("details")
+
+        if not isinstance(details, list):
+            raise ApiClientError(
+                "Wordlist task did not return a list in details"
+            )
+
+        return details

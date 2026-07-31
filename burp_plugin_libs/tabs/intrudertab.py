@@ -21,6 +21,7 @@ from javax.swing.event import ListSelectionListener
 from urlparse import urlparse
 
 from burp_plugin_libs.readonlytablemodel import ReadOnlyTableModel
+from burp_plugin_libs.api_client import TaskApiClient, ApiClientError
 
 
 MARKER = u"\u00A7"
@@ -91,11 +92,8 @@ class IntruderStartAction(ActionListener):
         self.results_tablemodel = results_tablemodel
         self.target = target
         self.http_request_template = http_request_template
-        self.payloads=[
-            "Logout",
-            "Logoff",
-            "Signout",
-        ]
+        client = TaskApiClient()
+        self.payloads=client.generate_wordlist()
         self.results = []
 
     def actionPerformed(self, event):

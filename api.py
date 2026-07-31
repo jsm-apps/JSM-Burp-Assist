@@ -132,7 +132,7 @@ def process_ai_task(prompt_file, task_id, url, raw_response):
 
 
 
-@app.route("/ai/wordlist", methods=["GET"])
+@app.route("/ai/wordlist", methods=["GET", "POST"])
 def get_wordlist():
     task_id = str(uuid.uuid4())
     
@@ -148,8 +148,13 @@ def get_wordlist():
         daemon=True,
     )
     worker.start()
+
+    return jsonify({
+            "task_id": task_id,
+            "status": "pending",
+        }), 202
         
-    return redirect(url_for("get_task", task_id=task_id))
+    #return redirect(url_for("get_task", task_id=task_id))
 
 
 
