@@ -20,12 +20,14 @@ class ResultsTabManager(object):
     Owns the Tasks and Issues tabs.
     """
 
-    def __init__(self, error_callback=None):
+    def __init__(self, callbacks, helpers, error_callback=None):
+        self.callbacks = callbacks
+        self.helpers = helpers
         self._error_callback = error_callback
         self.task_manager = TaskManager(error_callback=error_callback)
         self.issue_manager = IssueManager(error_callback=error_callback)
         self.debug_tab = DebugTab(error_callback=error_callback)
-        self.intruder_tab = IntruderTab(error_callback=error_callback)
+        self.intruder_tab = IntruderTab(self.callbacks, self.helpers, error_callback=error_callback)
 
         self._tabs = None
         self._task_tab_index = 0

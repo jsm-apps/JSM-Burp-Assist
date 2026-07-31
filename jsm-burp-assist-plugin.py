@@ -41,6 +41,8 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
         callbacks.setExtensionName("JSM Burp Assist")
         self._results_manager = ResultsTabManager(
+            self._callbacks,
+            self._helpers,
             error_callback=self._print_err
         )
         self._main_panel = self._results_manager.build_ui()

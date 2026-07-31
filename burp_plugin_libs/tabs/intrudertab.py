@@ -13,32 +13,115 @@ from javax.swing import (
     JTable,
     
 )
+
+from urlparse import urlparse
+
 from burp_plugin_libs.readonlytablemodel import ReadOnlyTableModel
 
+
+MARKER = u"\u00A7"
+
 class IntruderStartAction(ActionListener):
-    def __init__(self, results_tablemodel):
+    def __init__(self, callbacks, helpers, results_tablemodel, target, http_request_template):
+        self.callbacks = callbacks
+        self.helpers = helpers
         self.results_tablemodel = results_tablemodel
+        self.target = target
+        self.http_request_template = http_request_template
         self.payloads=[
             "Logout",
             "Logoff",
             "Signout",
         ]
+        self.results = []
 
     def actionPerformed(self, event):
-        for x in self.payloads:
+        raw_http_request_template = self.http_request_template.getText()
+        for index, payload in enumerate(self.payloads):
+            
+            raw_request = self.apply_payload(raw_http_request_template, payload)
+            status_code, response_length = self.makeRequest(raw_request)
+
             row = [
-                1,
-                x,
-                200,
-                1234
+                index,
+                payload,
+                status_code,
+                response_length
             ]
 
             self.results_tablemodel.addRow(row)
 
+    def apply_payload(self, text_block, payload):
+        """
+        Replace every §...§ placeholder with the same payload.
+        Compatible with Jython 2.7.
+        """
+        if text_block is None:
+            return None
+
+        result = []
+        position = 0
+
+        while True:
+            start = text_block.find(MARKER, position)
+
+            if start == -1:
+                result.append(text_block[position:])
+                break
+
+            end = text_block.find(MARKER, start + len(MARKER))
+
+            # Unmatched marker: preserve the rest unchanged.
+            if end == -1:
+                result.append(text_block[position:])
+                break
+
+            result.append(text_block[position:start])
+            result.append(payload)
+
+            position = end + len(MARKER)
+
+        return u"".join(result)
+
+    def makeRequest(self, http_request):
+        baseurl = target.getText()
+        if not baseurl:
+            return
+
+        parsed = urlparse(baseurl)
+        protocol = parsed.scheme
+        host = parsed.hostname
+
+        if parsed.port:
+            port = parsed.port
+        elif protocol == "https":
+            port = 443
+        else:
+            port = 80
+
+        service = self.helpers.buildHttpService(host, port, protocol)
+        request_bytes = self.helpers.stringToBytes(http_request)
+        result = self.callbacks.makeHttpRequest(service, request_bytes)
+        response_bytes = result.getResponse()
+        if response_bytes is None:
+            print("No response received.")
+            return
+
+        response_info = self._helpers.analyzeResponse(response_bytes)
+
+        status_code = response_info.getStatusCode()
+        response_length = len(response_bytes)
+
+        return status_code, response_length
+
+
 
 class IntruderWindow(ActionListener):
-    def __init__(self, target):
+    def __init__(self, callbacks, helpers, target, http_request_template):
+        self.callbacks = callbacks
+        self.helpers = helpers
         self.target = target
+        self.http_request_template = http_request_template
 
     def actionPerformed(self, event):
         frame = JFrame("JSM Intruder")
@@ -91,14 +174,10 @@ class IntruderWindow(ActionListener):
         frame.add(centre_panel, BorderLayout.CENTER)
         frame.add(south_panel, BorderLayout.SOUTH)
 
-        btn_start.addActionListener(IntruderStartAction(self._table_model))
+        btn_start.addActionListener(IntruderStartAction(self.callbacks, self.helpers, self._table_model, self.target, self.http_request_template ))
 
         frame.setLocationRelativeTo(None)  # Centre on screen
         frame.setVisible(True)
-
-
-
-MARKER = u"\u00A7"
 
 class AddMarkerAction(ActionListener):
     def __init__(self, text_area):
@@ -128,7 +207,9 @@ class ClearMarkerAction(ActionListener):
         self._text_area.setText(text)
 
 class IntruderTab(object):
-    def __init__(self, error_callback=None):
+    def __init__(self, callbacks, helpers, error_callback=None):
+        self.callbacks = callbacks
+        self.helpers = helpers
         self._error_callback = error_callback
         self._panel = None
         
@@ -180,7 +261,7 @@ class IntruderTab(object):
 
         run_button = JButton("Start Intruder...")
         run_button.setBounds(10, 500, 220, 30)
-        run_button.addActionListener(IntruderWindow(self._target_field))
+        run_button.addActionListener(IntruderWindow(self.callbacks, self.helpers, self._target_field, self._details_area))
         self._panel.add(run_button)
 
 
