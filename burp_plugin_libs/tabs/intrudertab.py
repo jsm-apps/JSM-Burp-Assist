@@ -1,34 +1,19 @@
 # -*- coding: utf-8 -*-
 
 from java.awt.event import ActionListener
-from java.awt import BorderLayout, FlowLayout
 from javax.swing import (
     JPanel,
     JLabel,
     JButton,
-    JFrame,
     JScrollPane,
     JTextArea,
-    JTextField,
-    JTable,
-    
+    JTextField  
 )
 
-from java.lang import Runnable, Thread
-from javax.swing import SwingUtilities
-from javax.swing.event import ListSelectionListener
-
-from urlparse import urlparse
-
-from burp_plugin_libs.readonlytablemodel import ReadOnlyTableModel
-from burp_plugin_libs.api_client import TaskApiClient, ApiClientError
-
 from burp_plugin_libs.intruder.intruderstartaction import IntruderStartAction
-
 from burp_plugin_libs.intruder.intruderwindow import IntruderWindow
 
 MARKER = u"\u00A7"
-
 
 class AddMarkerAction(ActionListener):
     def __init__(self, text_area):
