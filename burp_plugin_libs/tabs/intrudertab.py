@@ -23,7 +23,7 @@ from urlparse import urlparse
 from burp_plugin_libs.readonlytablemodel import ReadOnlyTableModel
 from burp_plugin_libs.api_client import TaskApiClient, ApiClientError
 
-from burp_plugin_libs.intruder.intruderworker import IntruderStartAction
+from burp_plugin_libs.intruder.intruderstartaction import IntruderStartAction
 
 MARKER = u"\u00A7"
 
