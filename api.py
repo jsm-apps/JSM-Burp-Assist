@@ -13,82 +13,13 @@ import json
 from pydantic import BaseModel
 
 from ai_libs.wordlistgenerator import WordlistGenerator
+from ai_libs.aiutil import AIUtil
 
 model = "aratan/qwen3.5-uncensored:9b"
 ollama_host = "http://localhost:11434"
 ollama_client = Client(host=ollama_host)
 
-
-
-def load_from_file(filename):
-    base = "./prompts"
-    path = os.path.join(base, filename)
-
-    print("Looking for:", path)
-
-    if not os.path.isfile(path):
-        raise IOError("File not found: %s" % path)
-
-    with open(path, "r") as f:
-        return f.read()
-
-def create_summary(system_prompt_file, url, stringcontent):
-    """
-    Ask Ollama to summarise the supplied string.
-
-    Args:
-        stringcontent: Text to summarise.
-
-    Returns:
-        The generated summary as a string.
-
-    Raises:
-        ValueError: If no content was supplied.
-        RuntimeError: If Ollama fails or returns no summary.
-    """
-    if stringcontent is None:
-        raise ValueError("stringcontent is required")
-
-    stringcontent = str(stringcontent).strip()
-
-    if not stringcontent:
-        raise ValueError("stringcontent cannot be empty")
-
-    system_prompt = load_from_file(system_prompt_file)
-
-    prompt = (
-        "URL: {}\n"
-        "HTTP Response:\n"
-        "{}"
-    ).format(url, stringcontent)
-
-    full_prompt = system_prompt+"\n"+prompt
-    print(full_prompt)
-
-    try:
-        response = ollama_client.generate(
-            model=model,
-            prompt=full_prompt
-        )
-
-        # Support both object-style and dictionary-style responses.
-        if hasattr(response, "response"):
-            summary = response.response
-        else:
-            summary = response.get("response")
-
-        if not summary:
-            raise RuntimeError(
-                "Ollama returned an empty summary"
-            )
-
-        return summary.strip()
-
-    except Exception as exc:
-        raise RuntimeError(
-            "Failed to create summary: {}".format(exc)
-        )
-
+aiutil = AIUtil()
 
 app = Flask(__name__)
 
@@ -107,7 +38,7 @@ def process_ai_task(prompt_file, task_id, url, raw_response):
         #time.sleep(10)
 
         http_response = raw_response
-        summary = create_summary(prompt_file, url, http_response)
+        summary = aiutil.create_summary(prompt_file, url, http_response)
 
         result = {
             "task_id": task_id,
