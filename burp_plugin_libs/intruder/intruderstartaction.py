@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from java.awt.event import ActionListener
 from urlparse import urlparse
 from java.lang import Thread
