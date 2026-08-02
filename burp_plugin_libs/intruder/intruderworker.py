@@ -103,7 +103,9 @@ class IntruderWorker(Runnable):
                         return
 
                     if payload in all_payloads:
-                        self.scoreboard.decreaseScore(payload)
+                        #self.scoreboard.decreaseScore(payload)
+                        # we only want to enforce positive scores...
+                        ignore=True
                     else:
                         try:
                             raw_request = self._apply_payload(

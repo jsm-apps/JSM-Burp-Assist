@@ -27,13 +27,14 @@ class WordlistGenerator():
         self.tasks = tasks
         self.tasks_lock = tasks_lock
         prompt_file = "wordlists.prompt.txt"
-        system_prompt = load_from_file(prompt_file)
-        self.messages=[{"role": "system", "content": system_prompt}]
+        self.system_prompt = load_from_file(prompt_file)
+        
 
     def generate_wordlist(self, task_id, score, score_lines):
         try:
             #if(len(self.messages) > 1):
-            message = "Last score: "+str(score)+"\nscore breakdown:"+score_lines
+            self.messages=[{"role": "system", "content": self.system_prompt}]
+            message = "Last score: "+str(score)+"\nscore breakdown:"+score_lines+"\n"
             print(message)
             self.messages.append({"role": "user", "content": message})
 
@@ -58,10 +59,10 @@ class WordlistGenerator():
 
             word_list = WordList.model_validate_json(content)
 
-            self.messages.append({
-                "role": "assistant",
-                "content": content
-            })
+            #self.messages.append({
+            #    "role": "assistant",
+            #    "content": content
+            #})
 
 
             
