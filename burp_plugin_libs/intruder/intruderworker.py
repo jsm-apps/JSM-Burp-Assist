@@ -73,6 +73,15 @@ class IntruderWorker(Runnable):
         finally:
             self._lock.unlock()
 
+    def getPayloads(self, score, score_lines):
+        try:
+            payloads = self.client.generate_wordlist(score, score_lines)
+            return payloads
+        except Exception as ex:
+            print("error at getPayloads: "+str(ex))
+            pass
+        return []
+
     def run(self):
         try:
             all_payloads=[]
@@ -83,7 +92,7 @@ class IntruderWorker(Runnable):
                 if not self._wait_if_paused():
                     return
 
-                payloads = self.client.generate_wordlist(score, score_lines)
+                payloads = self.getPayloads(score, score_lines)
 
                 score_lines=[]
 
