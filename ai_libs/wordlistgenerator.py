@@ -33,7 +33,7 @@ class WordlistGenerator():
     def generate_wordlist(self, task_id, score, score_lines):
         try:
             #if(len(self.messages) > 1):
-            message = "Last score: "+score+"\nscore breakdown:"+score_lines
+            message = "Last score: "+str(score)+"\nscore breakdown:"+score_lines
             print(message)
             self.messages.append({"role": "user", "content": message})
 
