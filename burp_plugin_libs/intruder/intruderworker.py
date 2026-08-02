@@ -85,7 +85,6 @@ class IntruderWorker(Runnable):
 
                 payloads = self.client.generate_wordlist(score, score_lines)
 
-                score = 0
                 score_lines=[]
 
                 for index, payload in enumerate(payloads):

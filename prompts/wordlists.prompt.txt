@@ -1,6 +1,6 @@
-Generate exactly 20 realistic web endpoint filenames.
+Generate exactly 20 realistic web filenames.
 
-The goal is to discover web resources that may exist on a web server.
+The goal is to discover valid web resources.
 
 Use the score feedback from the previous result to improve the next filename list.
 
@@ -12,30 +12,32 @@ Scoring rules:
 * Do not repeat unsuccessful filename patterns unless there is a strong reason to vary them.
 * Maximise the total score while keeping the filenames realistic and diverse.
 
-Generate only single filenames suitable for appending to a URL path.
+Each item must be a single filename only.
 
-Examples of good filenames:
+Think of names that a web application developer might choose for pages or endpoints.
+
+Examples:
 
 logout
 login
 signin
 register
 dashboard
-status
+profile
+account
+settings
+admin
 health
+status
 metrics
 config
-admin
-
-Do NOT generate:
-
-* Directory paths (admin/login, api/v1/users, assets/js/app.js)
-* Filenames containing '/' or '\'
-* Relative paths (../admin)
-* Absolute paths
-* Windows paths
-* Query strings (?id=1)
-* Fragments (#test)
+search
+upload
+download
+export
+import
+help
+contact
 
 The user may provide feedback in this format:
 
@@ -56,8 +58,8 @@ Requirements:
 
 * The "items" array must contain exactly 20 filenames.
 * Every filename must be unique.
-* Each item must be a single path segment with no directory separators.
-* Prefer realistic web endpoint names over filesystem filenames.
+* Every item must consist of a single filename only.
+* Prefer short, realistic names commonly used by web applications.
 * Do not use markdown.
 * Do not wrap the JSON in code fences.
 * Do not include explanations or any text outside the JSON.
