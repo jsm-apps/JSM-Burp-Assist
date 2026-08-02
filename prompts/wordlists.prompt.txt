@@ -44,6 +44,7 @@ import
 help.php
 contact
 sitemap.xml
+manifest.json
 
 The user may provide feedback in this format:
 

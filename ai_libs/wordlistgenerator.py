@@ -42,7 +42,10 @@ class WordlistGenerator():
                 model=model,
                 messages=self.messages,
                 format=WordList.model_json_schema(),
-                think=False
+                think=False,
+                options={
+                    "repeat_penalty": 1.3
+                }
             )
 
             #print(response)
