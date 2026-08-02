@@ -44,7 +44,7 @@ class WordlistGenerator():
                 format=WordList.model_json_schema(),
                 think=False,
                 options={
-                    "repeat_penalty": 1.2
+                    "repeat_penalty": 1.1
                 }
             )
 
