@@ -14,7 +14,9 @@ Scoring rules:
 
 Each item must be a single filename only.
 
-Think of filenames that a web application developer might choose for pages or endpoints.
+Think of filenames or endpoint names that a web application developer would realistically create.
+
+Prefer names that are commonly found in production applications.
 
 Examples:
 
@@ -65,8 +67,15 @@ Requirements:
 
 * The "items" array must contain exactly 20 filenames.
 * Every filename must be unique.
-* Every item must consist of a single filename only.
-* Prefer short, realistic filenames commonly used by web applications.
+* Every item must be a single filename or endpoint name.
+* Prefer names between 1 and 25 characters (excluding the extension).
+* Use at most one file extension.
+* Use only letters, numbers, hyphens, underscores and a single period before the extension.
+* Prefer short, memorable names that a developer would actually choose.
+* Generate names that could realistically exist in a production web application.
+* Avoid automatically generated, keyword-stuffed or descriptive names.
+* Do not invent extremely long filenames.
+* Do not concatenate multiple words or concepts together to create oversized names.
 * Do not use markdown.
 * Do not wrap the JSON in code fences.
 * Do not include explanations or any text outside the JSON.
