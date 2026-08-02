@@ -191,24 +191,27 @@ class TaskApiClient(object):
             status_callback=status_callback,
         )
 
-    def create_wordlist_task(self):
+    def create_wordlist_task(self, score, score_lines):
         """
         Start a wordlist generation task.
 
-        Expected response after Flask follows the redirect:
+        Expected response:
 
             {
                 "task_id": "...",
                 "status": "pending"
             }
         """
+        data={"score": 0, "score_lines":""}
+        if len(score_lines) > 0:
+            data={"score": score, "score_lines": "\n".join(score_lines)}
         return self._request(
             method="POST",
             path="/ai/wordlist",
-            data={},
+            data=data,
         )
 
-    def generate_wordlist(self, poll_interval=10, timeout=300, status_callback=None,):
+    def generate_wordlist(self, score, score_lines, poll_interval=10, timeout=300, status_callback=None,):
         """
         Start a wordlist task and wait for the generated filenames.
 
@@ -220,7 +223,7 @@ class TaskApiClient(object):
                 "Default.aspx.cs"
             ]
         """
-        created_task = self.create_wordlist_task()
+        created_task = self.create_wordlist_task(score, score_lines)
 
         task_id = created_task.get("task_id")
 

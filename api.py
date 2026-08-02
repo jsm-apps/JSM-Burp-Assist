@@ -65,6 +65,17 @@ def process_ai_task(prompt_file, task_id, url, raw_response):
 
 @app.route("/ai/wordlist", methods=["GET", "POST"])
 def get_wordlist():
+    data = request.get_json(silent=True)
+    
+    if not data:
+        return jsonify({
+            "error": "Request body must contain JSON."
+        }), 400
+
+    score = data.get("score")
+    score_lines = data.get("score_lines")
+
+
     task_id = str(uuid.uuid4())
     
     with tasks_lock:
@@ -75,7 +86,7 @@ def get_wordlist():
 
     worker = threading.Thread(
         target=generator.generate_wordlist,
-        args=(task_id,),
+        args=(task_id, score, score_lines,),
         daemon=True,
     )
     worker.start()

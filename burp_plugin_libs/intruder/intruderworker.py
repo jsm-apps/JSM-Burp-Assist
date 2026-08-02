@@ -76,11 +76,14 @@ class IntruderWorker(Runnable):
     def run(self):
         try:
             all_payloads=[]
+            score = 0
+            score_lines=[]
+
             while not self._stopped:
                 if not self._wait_if_paused():
                     return
 
-                payloads = self.client.generate_wordlist()
+                payloads = self.client.generate_wordlist(score, score_lines)
 
                 score = 0
                 score_lines=[]

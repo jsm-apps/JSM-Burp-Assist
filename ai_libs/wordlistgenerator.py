@@ -30,10 +30,11 @@ class WordlistGenerator():
         system_prompt = load_from_file(prompt_file)
         self.messages=[{"role": "system", "content": system_prompt}]
 
-    def generate_wordlist(self, task_id):
+    def generate_wordlist(self, task_id, score, score_lines):
         try:
             #if(len(self.messages) > 1):
-            self.messages.append({"role": "user", "content": "Known files: Logout.aspx"})
+            message = "Last score: "+score+"\nscore breakdown:"+score_lines
+            self.messages.append({"role": "user", "content": message})
 
 
             response = ollama_client.chat(
