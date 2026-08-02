@@ -34,7 +34,7 @@ class IntruderWorker(Runnable):
 
         self._paused = False
         self._stopped = False
-        self.scoreboard = ScoreBoard()
+        
 
     def pause(self):
         self._lock.lock()
@@ -86,6 +86,7 @@ class IntruderWorker(Runnable):
 
     def run(self):
         try:
+            self.scoreboard = ScoreBoard()
             all_payloads=[]
 
             while not self._stopped:
