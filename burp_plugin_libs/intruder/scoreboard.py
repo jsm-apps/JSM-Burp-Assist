@@ -4,11 +4,11 @@ class ScoreBoard():
         self.score_lines = []
 
     def increaseScore(self, payload):
-        self.score = score + 1
+        self.score = self.score + 1
         self.score_lines.append(payload+" (+1 point)")
 
     def decreaseScore(self, payload):
-        self.score = score - 2
+        self.score = self.score - 2
         # dont add to score lines as we want score lines to contain positive results
 
     def getScore(self):
