@@ -3,6 +3,7 @@ from java.util.concurrent.locks import ReentrantLock
 from javax.swing import SwingUtilities
 
 from burp_plugin_libs.api_client import TaskApiClient, ApiClientError
+from burp_plugin_libs.intruder.scoreboard import ScoreBoard
 
 class AddResultRow(Runnable):
     def __init__(self, table_model, row):
@@ -33,6 +34,7 @@ class IntruderWorker(Runnable):
 
         self._paused = False
         self._stopped = False
+        self.scoreboard = ScoreBoard()
 
     def pause(self):
         self._lock.lock()
@@ -85,24 +87,22 @@ class IntruderWorker(Runnable):
     def run(self):
         try:
             all_payloads=[]
-            score = 0
-            score_lines=[]
 
             while not self._stopped:
                 if not self._wait_if_paused():
                     return
 
-                payloads = self.getPayloads(score, score_lines)
+                score = self.scoreboard.getScore()
+                score_lines = self.scoreboard.getScorelines()
 
-                score_lines=[]
+                payloads = self.getPayloads(score, score_lines)
 
                 for index, payload in enumerate(payloads):
                     if not self._wait_if_paused():
                         return
 
                     if payload in all_payloads:
-                        score = score - 2
-                        score_lines.append(payload+" -2")
+                        self.scoreboard.decreaseScore(payload)
                     else:
                         try:
                             raw_request = self._apply_payload(
@@ -118,8 +118,7 @@ class IntruderWorker(Runnable):
                             ) = self._make_request(raw_request)
 
                             if status_code == 200:
-                                score = score + 1
-                                score_lines.append(payload+" +1")
+                                self.scoreboard.increaseScore(payload)
 
 
                             row = [
