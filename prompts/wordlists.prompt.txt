@@ -14,7 +14,7 @@ Scoring rules:
 
 Each item must be a single filename only.
 
-Think of names that a web application developer might choose for pages or endpoints.
+Think of filenames that a web application developer might choose for pages or endpoints.
 
 Examples:
 
@@ -22,21 +22,26 @@ logout
 login
 signin
 register
+phpinfo.php
 dashboard
 profile
 account
 settings
+index.html
+app.js
+Web.config
 admin
 health
 status
 metrics
+robots.txt
 config
 search
-upload
+upload.aspx
 download
 export
 import
-help
+help.php
 contact
 
 The user may provide feedback in this format:
@@ -59,7 +64,7 @@ Requirements:
 * The "items" array must contain exactly 20 filenames.
 * Every filename must be unique.
 * Every item must consist of a single filename only.
-* Prefer short, realistic names commonly used by web applications.
+* Prefer short, realistic filenames commonly used by web applications.
 * Do not use markdown.
 * Do not wrap the JSON in code fences.
 * Do not include explanations or any text outside the JSON.
