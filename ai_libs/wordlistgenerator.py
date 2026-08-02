@@ -34,6 +34,7 @@ class WordlistGenerator():
         try:
             #if(len(self.messages) > 1):
             message = "Last score: "+score+"\nscore breakdown:"+score_lines
+            print(message)
             self.messages.append({"role": "user", "content": message})
 
 
