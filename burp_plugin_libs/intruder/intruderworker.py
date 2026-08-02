@@ -75,54 +75,70 @@ class IntruderWorker(Runnable):
 
     def run(self):
         try:
+            all_payloads=[]
             while not self._stopped:
                 if not self._wait_if_paused():
                     return
 
                 payloads = self.client.generate_wordlist()
 
+                score = 0
+                score_lines=[]
+
                 for index, payload in enumerate(payloads):
                     if not self._wait_if_paused():
                         return
 
-                    try:
-                        raw_request = self._apply_payload(
-                            self._http_request_template,
-                            payload
+                    if payload in all_payloads:
+                        score = score - 2
+                        score_lines.append(payload+" -2")
+                    else:
+                        try:
+                            raw_request = self._apply_payload(
+                                self._http_request_template,
+                                payload
+                            )
+
+                            (
+                                status_code,
+                                response_length,
+                                request_text,
+                                response_text
+                            ) = self._make_request(raw_request)
+
+                            if status_code == 200:
+                                score = score + 1
+                                score_lines.append(payload+" +1")
+
+
+                            row = [
+                                index,
+                                payload,
+                                status_code,
+                                response_length,
+                                request_text,
+                                response_text
+                            ]
+
+                            all_payloads.append(payload)
+
+                        except Exception as ex:
+                            row = [
+                                index,
+                                payload,
+                                "Error",
+                                0,
+                                "",
+                                str(ex)
+                            ]
+
+                        SwingUtilities.invokeLater(
+                            AddResultRow(
+                                self._results_tablemodel,
+                                row
+                            )
                         )
-
-                        (
-                            status_code,
-                            response_length,
-                            request_text,
-                            response_text
-                        ) = self._make_request(raw_request)
-
-                        row = [
-                            index,
-                            payload,
-                            status_code,
-                            response_length,
-                            request_text,
-                            response_text
-                        ]
-
-                    except Exception as ex:
-                        row = [
-                            index,
-                            payload,
-                            "Error",
-                            0,
-                            "",
-                            str(ex)
-                        ]
-
-                    SwingUtilities.invokeLater(
-                        AddResultRow(
-                            self._results_tablemodel,
-                            row
-                        )
-                    )
-
+                print(score)
+                print(score_lines)
         except Exception as ex:
             print("Intruder worker error: {0}".format(str(ex)))
