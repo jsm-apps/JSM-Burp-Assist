@@ -20,6 +20,9 @@ Prefer names that are commonly found in production applications.
 
 Examples:
 
+swagger
+swagger-ui
+api-doc
 logout
 login
 signin
