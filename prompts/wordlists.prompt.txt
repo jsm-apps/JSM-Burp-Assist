@@ -1,4 +1,4 @@
-Generate exactly 20 realistic web filenames to discover api documentation.
+Generate exactly 20 realistic web filenames.
 
 The goal is to discover valid web resources.
 
