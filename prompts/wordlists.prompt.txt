@@ -7,9 +7,7 @@ Use the score feedback from the previous result to improve the next filename lis
 Scoring rules:
 
 * +1 point when a filename returns HTTP status 200.
-* -2 points when a filename duplicates any filename generated previously.
 * Avoid all previously generated filenames.
-* Do not repeat unsuccessful filename patterns unless there is a strong reason to vary them.
 * Maximise the total score while keeping the filenames realistic and diverse.
 
 Each item must be a single filename only.
