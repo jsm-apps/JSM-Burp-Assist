@@ -3,6 +3,7 @@
 import threading
 import time
 import uuid
+import argparse
 
 from flask import Flask, jsonify, request, redirect, url_for
 from ollama import Client
@@ -15,11 +16,6 @@ from pydantic import BaseModel
 from ai_libs.wordlistgenerator import WordlistGenerator
 from ai_libs.aiutil import AIUtil
 
-model = "aratan/qwen3.5-uncensored:9b"
-ollama_host = "http://localhost:11434"
-ollama_client = Client(host=ollama_host)
-
-aiutil = AIUtil()
 
 app = Flask(__name__)
 
@@ -28,6 +24,21 @@ app = Flask(__name__)
 tasks = {}
 tasks_lock = threading.Lock()
 generator = WordlistGenerator(tasks, tasks_lock)
+
+
+def create_pending_task(url = None):
+    task_id = str(uuid.uuid4())
+    record = {}
+    if url == None:
+        record = {"task_id": task_id, "status": "pending"}
+    else:
+        record = {"task_id": task_id, "status": "pending", "url": url}
+
+    with tasks_lock:
+        tasks[task_id] = record
+
+    return task_id
+
 
 
 def process_ai_task(prompt_file, task_id, url, raw_response):
@@ -76,13 +87,7 @@ def get_wordlist():
     score_lines = data.get("score_lines")
 
 
-    task_id = str(uuid.uuid4())
-    
-    with tasks_lock:
-        tasks[task_id] = {
-            "task_id": task_id,
-            "status": "pending"
-        }
+    task_id = create_pending_task()
 
     worker = threading.Thread(
         target=generator.generate_wordlist,
@@ -123,14 +128,7 @@ def create_task():
             "error": "URL must start with http:// or https://."
         }), 400
 
-    task_id = str(uuid.uuid4())
-
-    with tasks_lock:
-        tasks[task_id] = {
-            "task_id": task_id,
-            "status": "pending",
-            "url": url,
-        }
+    task_id = create_pending_task(url)
 
     worker = threading.Thread(
         target=process_ai_task,
@@ -168,14 +166,7 @@ def create_xss_task():
             "error": "URL must start with http:// or https://."
         }), 400
 
-    task_id = str(uuid.uuid4())
-
-    with tasks_lock:
-        tasks[task_id] = {
-            "task_id": task_id,
-            "status": "pending",
-            "url": url,
-        }
+    task_id = create_pending_task(url)
 
     worker = threading.Thread(
         target=process_ai_task,
@@ -219,14 +210,7 @@ def create_question_task():
     with open("prompts/question.prompt.txt", "w", encoding="utf-8") as f:
         f.write(question)
 
-    task_id = str(uuid.uuid4())
-
-    with tasks_lock:
-        tasks[task_id] = {
-            "task_id": task_id,
-            "status": "pending",
-            "url": url,
-        }
+    task_id = create_pending_task(url)
 
     worker = threading.Thread(
         target=process_ai_task,
@@ -252,6 +236,26 @@ def get_task(task_id):
         }), 404
 
     return jsonify(task), 200
+
+# main entrypoint
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--model",
+    default="aratan/qwen3.5-uncensored:9b",
+    help="Ollama Model to use"
+)
+parser.add_argument(
+    "--ollama-host",
+    default="http://localhost:11434",
+    help="Ollama server URL"
+)
+args = parser.parse_args()
+
+model = args.model
+ollama_host = args.ollama_host
+
+
+aiutil = AIUtil(model, ollama_host)
 
 
 if __name__ == "__main__":

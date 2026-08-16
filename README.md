@@ -18,6 +18,10 @@ Press CTRL+C to quit
  * Restarting with stat
  * Debugger is active!
 
+
+model or ollama host can be passed to API:
+$ python3.11 api.py --model=qwen3.5:latest --ollama-host=http://192.168.1.100:11434
+
 # Open to job opportunities
 
 I am currently looking for a new role. If you have an opening in AI or penetration testing, please feel free to reach out via LinkedIn: https://www.linkedin.com/in/michael-minchinton-2a5091273/

@@ -2,9 +2,9 @@ import os
 from ollama import Client
 
 class AIUtil():
-    def __init__(self):
-        self.model = "aratan/qwen3.5-uncensored:9b"
-        self.ollama_host = "http://localhost:11434"
+    def __init__(self, model, ollama_host):
+        self.model = model
+        self.ollama_host = ollama_host
         self.ollama_client = Client(host=self.ollama_host)
     
     def load_from_file(self, filename):
