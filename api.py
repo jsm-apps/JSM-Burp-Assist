@@ -39,7 +39,11 @@ def create_pending_task(url = None):
 
     return task_id
 
-
+def get_pending_task_json(task_id):
+    return jsonify({
+                    "task_id": task_id,
+                    "status": "pending",
+                }), 202
 
 def process_ai_task(prompt_file, task_id, url, raw_response):
     """
@@ -72,6 +76,20 @@ def process_ai_task(prompt_file, task_id, url, raw_response):
 
 
 
+@app.route("/ai/analyse-site", methods=["POST"])
+def analyse_site():
+    data = request.get_json(silent=True)
+    
+    if not data:
+        return jsonify({
+            "error": "Request body must contain JSON."
+        }), 400
+
+    task_id = create_pending_task()
+
+    return get_pending_task_json(task_id)
+
+
 
 
 @app.route("/ai/wordlist", methods=["GET", "POST"])
@@ -96,12 +114,7 @@ def get_wordlist():
     )
     worker.start()
 
-    return jsonify({
-            "task_id": task_id,
-            "status": "pending",
-        }), 202
-        
-    #return redirect(url_for("get_task", task_id=task_id))
+    return get_pending_task_json(task_id)
 
 
 
@@ -137,10 +150,7 @@ def create_task():
     )
     worker.start()
 
-    return jsonify({
-        "task_id": task_id,
-        "status": "pending",
-    }), 202
+    return get_pending_task_json(task_id)
 
 
 @app.route("/ai/xssdetect", methods=["POST"])
@@ -175,10 +185,7 @@ def create_xss_task():
     )
     worker.start()
 
-    return jsonify({
-        "task_id": task_id,
-        "status": "pending",
-    }), 202
+    return get_pending_task_json(task_id)
 
 
 
@@ -219,10 +226,7 @@ def create_question_task():
     )
     worker.start()
 
-    return jsonify({
-        "task_id": task_id,
-        "status": "pending",
-    }), 202
+    return get_pending_task_json(task_id)
 
 
 @app.route("/task/<task_id>", methods=["GET"])
