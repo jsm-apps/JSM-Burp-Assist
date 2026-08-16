@@ -19,7 +19,7 @@ Press CTRL+C to quit
  * Debugger is active!
 
 
-model or ollama host can be passed to API:
+Model or Ollama host can be passed to API:
 $ python3.11 api.py --model=qwen3.5:latest --ollama-host=http://192.168.1.100:11434
 
 # Open to job opportunities
