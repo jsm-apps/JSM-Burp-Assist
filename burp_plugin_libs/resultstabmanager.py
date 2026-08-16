@@ -14,6 +14,7 @@ from burp_plugin_libs.taskmanager import TaskManager
 from burp_plugin_libs.issuemanager import IssueManager
 from burp_plugin_libs.tabs.debugtab import DebugTab
 from burp_plugin_libs.tabs.intrudertab import IntruderTab
+from burp_plugin_libs.tabs.analysetab import AnalyseTab
 
 class ResultsTabManager(object):
     """
@@ -28,6 +29,7 @@ class ResultsTabManager(object):
         self.issue_manager = IssueManager(error_callback=error_callback)
         self.debug_tab = DebugTab(error_callback=error_callback)
         self.intruder_tab = IntruderTab(self.callbacks, self.helpers, error_callback=error_callback)
+        self.analyse_tab = AnalyseTab(self.callbacks, self.helpers, error_callback=error_callback)
 
         self._tabs = None
         self._task_tab_index = 0
@@ -42,11 +44,13 @@ class ResultsTabManager(object):
         issue_panel = self.issue_manager.build_ui()
         debug_panel = self.debug_tab.build_ui()
         intruder_panel = self.intruder_tab.build_ui()
+        analyse_panel = self.analyse_tab.build_ui()
 
         self._tabs.addTab("Tasks (0)", task_panel)
         self._tabs.addTab("Issues (0)", issue_panel)
         self._tabs.addTab("Debug", debug_panel)
         self._tabs.addTab("Intruder", intruder_panel)
+        self._tabs.addTab("Analyser", analyse_panel)
 
         return self._tabs
 

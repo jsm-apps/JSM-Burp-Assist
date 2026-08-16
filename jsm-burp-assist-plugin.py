@@ -58,7 +58,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
     def createMenuItems(self, invocation):
         mi = MenuItems(invocation)
-        return mi.getMenuItems(self._handle_tech_detect, self._handle_xss_detection, self._handle_question, self._handle_send_to_intruder)
+        return mi.getMenuItems(self._handle_tech_detect, self._handle_xss_detection, self._handle_question, self._handle_send_to_intruder, self._handle_send_to_analyser)
 
     def _run_menuitem(self, invocation, path, question = None):
         try:
@@ -122,7 +122,13 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
     def _handle_send_to_intruder(self, invocation):
         url, raw_http_request, message = self.utils.get_selected_url_and_request(invocation)
         self._results_manager.intruder_tab.setHTTPRequestTextAndURL(raw_http_request, get_base_url(url))
+
+    def _handle_send_to_analyser(self, invocation):
+        #url, raw_http_request, message = self.utils.get_selected_url_and_request(invocation)
+        #self._results_manager.intruder_tab.setHTTPRequestTextAndURL(raw_http_request, get_base_url(url))
+        todo=True
         
+
     def api_complete(self, task_id, message, result):
         self._results_manager.complete_task(task_id)
         self._print("API Task {} completed".format(task_id))

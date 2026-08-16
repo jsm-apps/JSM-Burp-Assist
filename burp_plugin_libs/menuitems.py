@@ -5,7 +5,7 @@ class MenuItems():
     def __init__(self, invocation):
         self.invocation = invocation
 
-    def getMenuItems(self, _handle_tech_detect, _handle_xss_detection, _handle_question, _handle_send_to_intruder):
+    def getMenuItems(self, _handle_tech_detect, _handle_xss_detection, _handle_question, _handle_send_to_intruder, _handle_send_to_analyser):
         menu = ArrayList()
         item = JMenuItem(
             "Technology Detect",
@@ -34,4 +34,12 @@ class MenuItems():
                 _handle_send_to_intruder(self.invocation)
         )        
         menu.add(item4)
+
+        item5 = JMenuItem(
+                    "Analyse Site",
+                    actionPerformed=lambda event:
+                        _handle_send_to_analyser(self.invocation)
+                )        
+        menu.add(item5)
+
         return menu
